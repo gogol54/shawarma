@@ -1,8 +1,13 @@
 'use client'
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { ConsumptionMethod } from "@prisma/client";
+import { Loader2Icon } from "lucide-react";
+import { useParams, useSearchParams } from "next/navigation";
+import { useContext, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { PatternFormat } from 'react-number-format' 
+import { toast } from "sonner";
 import z from "zod"
 
 import { Button } from "@/components/ui/button";
@@ -25,6 +30,8 @@ import {
   FormMessage} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
+import { createOrder } from "../actions/create-order";
+import { CartContext } from "../contexts/cart";
 import { validateCPF } from "../helpers/cpf";
 
 const formSchema = z.object({
@@ -45,6 +52,11 @@ interface FinishOrderDialogProps{
 }
 
 const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
+  const search = useSearchParams()
+  const { products, clearCart } = useContext(CartContext)
+  const [isPending, startTransition] = useTransition()
+  const { slug } = useParams<{slug: string}>()
+
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -53,14 +65,30 @@ const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
     },
     shouldUnregister: true,
   })
-  const onSubmit = (data: FormSchema) => {
-    console.log(data)
+  const onSubmit = async (data: FormSchema) => {
+    try {
+      startTransition(async () => {
+        const consumptionMethod = search.get("consumptionMethod") as ConsumptionMethod;
+        await createOrder({
+          consumptionMethod,
+          customerCpf: data.cpf,
+          customerName: data.name,
+          products,
+          slug 
+        })
+        clearCart()
+        onOpenChange(false)
+        toast.success("Agradecemos pela preferência, agora é só esperar!")
+      })
+    } catch (error) {
+      toast.error("Algum erro foi encontrado, tente novamente!")
+      console.log(error)
+    }
   }
 
   return ( 
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerTrigger asChild>
-       
+      <DrawerTrigger>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
@@ -106,7 +134,9 @@ const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
                   type="submit" 
                   variant="destructive" 
                   className="rounded-full"
+                  disabled={isPending}
                 >
+                  {isPending && <Loader2Icon className="animate-spin" />}
                   Finalizar
                 </Button>
                 <DrawerClose>

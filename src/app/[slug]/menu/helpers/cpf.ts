@@ -1,3 +1,7 @@
+export const removePoints = (cpf: string) => {
+  return cpf.replace(/[\.\-]/g, "");
+}
+
 export const validateCPF = (cpf: string): boolean => {
   cpf = cpf.replace(/[^\d]+/g, ""); // Remove caracteres não numéricos
   if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false; // Verifica tamanho e repetição
