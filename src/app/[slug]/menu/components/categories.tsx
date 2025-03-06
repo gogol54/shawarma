@@ -1,10 +1,11 @@
 'use client'
 
 import { MenuCategory, Prisma } from "@prisma/client";
-import { ClockIcon } from "lucide-react";
+import { ClockIcon, LockIcon } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
+import { isOpen } from "@/app/helpers/is-open";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
@@ -24,6 +25,7 @@ const RestaurantCategories = ({restaurant}: RestaurantCategoriesProps) => {
   const handleCategoryClick = (category: MenuCategory) => {
     setSelectedCategory(category)
   }
+  const open = isOpen()
   const getCategoryBtn = (category: MenuCategory) => {
     return selectedCategory.id === category.id ? "default" : "secondary"
   }
@@ -42,9 +44,18 @@ const RestaurantCategories = ({restaurant}: RestaurantCategoriesProps) => {
             <p className="text-xs opacity-55">{restaurant.description}</p>
           </div>
         </div>
-        <div className="flex items-center gap-1 text-xs text-green-500 mt-3">
-          <ClockIcon size={12}/>
-          <p> Aberto! </p>
+        <div className="flex items-center gap-1 text-xs mt-3">
+          {open ? (
+            <div className="flex items-center gap-1 text-green-500">
+              <ClockIcon size={12} />
+              <p>Aberto!</p>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1 text-red-500">
+              <LockIcon size={12} />
+              <p>Fechado</p>
+            </div>
+          )}
         </div>
       </div>
      

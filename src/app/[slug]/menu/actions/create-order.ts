@@ -9,6 +9,7 @@ import { removePoints } from "../helpers/cpf";
 interface CreateOrderInput {
   customerName: string;
   customerCpf: string;
+  customerPhone: string;
   products: Array<{
     id: string;
     quantity: number;
@@ -48,12 +49,16 @@ export const createOrder = async (input: CreateOrderInput) => {
       status: "PENDING",
       customerName: input.customerName,
       customerCpf: removePoints(input.customerCpf),
+      customerPhone: removePoints(input.customerPhone),
       orderProducts: {
         createMany: {
           data: orderProductsValues,
         },
       },
-      total: orderProductsValues.reduce(
+      total: input.consumptionMethod === 'takeaway' ? orderProductsValues.reduce(
+        (acc, item) => acc + item.price * item.quantity,
+        0
+      ) + 8 : orderProductsValues.reduce(
         (acc, item) => acc + item.price * item.quantity,
         0
       ),

@@ -63,6 +63,7 @@ model Order {
   orderProducts     OrderProduct[]
   customerName      String
   customerCpf       String
+  customerPhone     String            @default("0000000000")
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 }

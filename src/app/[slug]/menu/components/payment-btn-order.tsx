@@ -42,6 +42,9 @@ const formSchema = z.object({
     message: "O cpf é obrigatório."
   }).refine((value) => validateCPF(value), {
     message: "CPF inválido!",
+  }),
+  phone: z.string().trim().min(1, {
+    message: "O contato é obrigatório."
   })
 })
 type FormSchema = z.infer<typeof formSchema>
@@ -62,17 +65,19 @@ const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
     defaultValues: {
       name: "",
       cpf: "",
+      phone: "",
     },
     shouldUnregister: true,
   })
   const onSubmit = async (data: FormSchema) => {
     try {
-      startTransition(async () => {
+      startTransition( async () => {
         const consumptionMethod = search.get("consumptionMethod") as ConsumptionMethod;
         await createOrder({
           consumptionMethod,
           customerCpf: data.cpf,
           customerName: data.name,
+          customerPhone: data.phone,
           products,
           slug 
         })
@@ -88,7 +93,7 @@ const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
 
   return ( 
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerTrigger>
+      <DrawerTrigger asChild>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
@@ -106,6 +111,24 @@ const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
                     <FormLabel>Digite seu nome</FormLabel>
                     <FormControl>
                       <Input placeholder="Digite seu nome..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Número para contato</FormLabel>
+                    <FormControl>
+                      <PatternFormat
+                        placeholder="(55)988025159"
+                        format="(##)#####-####"
+                        customInput={Input}
+                        {...field} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -139,7 +162,7 @@ const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
                   {isPending && <Loader2Icon className="animate-spin" />}
                   Finalizar
                 </Button>
-                <DrawerClose>
+                <DrawerClose asChild>
                   <Button 
                     variant="outline" 
                     className="rounded-full w-full"

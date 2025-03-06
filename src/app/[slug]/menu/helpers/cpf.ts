@@ -1,5 +1,5 @@
 export const removePoints = (cpf: string) => {
-  return cpf.replace(/[\.\-]/g, "");
+  return cpf.replace(/[\.\-\(\)]/g, "");
 }
 
 export const validateCPF = (cpf: string): boolean => {

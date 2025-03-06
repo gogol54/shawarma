@@ -35,9 +35,10 @@ const formSchema = z.object({
     message: "CPF inválido!",
   })
 })
+type FormSchema = z.infer<typeof formSchema>;
 
 const CpfForm = () => {
-  const form = useForm({
+  const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema)
   })
   const pathname = usePathname()
@@ -45,7 +46,6 @@ const CpfForm = () => {
   const handleCancel = () => {
     router.back()
   }
-  console.log(pathname)
   const onSubmit = (data: FormSchema) => {
     router.push(`${pathname}?cpf=${removePoints(data.cpf)}`)
   }
@@ -54,8 +54,8 @@ const CpfForm = () => {
     <Drawer open>
       <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle>Visualizar Pedidos</DrawerTitle>
-          <DrawerDescription>Insira seu CPF para encontrar o pedido</DrawerDescription>
+          <DrawerTitle>Encontre Seus Pedidos</DrawerTitle>
+          <DrawerDescription>Insira seu número para encontrar o pedido</DrawerDescription>
         </DrawerHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -85,7 +85,7 @@ const CpfForm = () => {
               >
                 Confirmar
               </Button>
-              <DrawerClose>
+              <DrawerClose asChild>
                 <Button 
                   variant="outline" 
                   className="rounded-full w-full"

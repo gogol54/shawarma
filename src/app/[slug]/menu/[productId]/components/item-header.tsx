@@ -5,6 +5,8 @@ import { ChevronLeftIcon, ScrollTextIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
+// import { useState } from "react";
+// import CpfForm from "@/app/[slug]/orders/components/cpf-form";
 import { Button } from "@/components/ui/button";
 
 
@@ -14,6 +16,7 @@ interface ProductHeaderProps {
 
 const ProductHeader = ({ product }: ProductHeaderProps) => {
   const router = useRouter()
+  // const [pressed, setPressed] = useState<boolean>(false)
   const handleBackClick = () => router.back()
 
   return (  
@@ -40,6 +43,7 @@ const ProductHeader = ({ product }: ProductHeaderProps) => {
 
     >
       <ScrollTextIcon />
+      {/* {pressed && <CpfForm />}  depois nos faz essa*/}
     </Button>
     
   
