@@ -9,12 +9,14 @@ interface ConsumptionMethodOptionProp {
   slug: string;
   imageUrl: string;
   imageAlt: string;
+  buttonText: string;
   option: ConsumptionMethod;
 }
 
 const ConsumptionMethodOption = ({
   imageUrl, 
   imageAlt, 
+  buttonText, 
   option, 
   slug 
 } : ConsumptionMethodOptionProp ) => {
@@ -30,7 +32,7 @@ const ConsumptionMethodOption = ({
           />
         </div>
         <Button variant="secondary" className="rounded-full" asChild>
-          <Link href={`${slug}/menu?consumptionMethod=${option}`}>{option === 'dine_in' ? 'Retirar no local' : 'Entrega 🛵'}</Link>
+          <Link href={`${slug}/menu?consumptionMethod=${option}`}>{buttonText}</Link>
         </Button>
       </CardContent>
     </Card>

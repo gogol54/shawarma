@@ -18,6 +18,9 @@ const OrdersPage = async ({searchParams}: OrdersPageProps) => {
     return <CpfForm />
   }
   const orders = await db.order.findMany({
+    orderBy: {
+      createdAt: 'desc',
+    },
     where: {
       customerCpf: removePoints(cpf)
     },
@@ -31,8 +34,8 @@ const OrdersPage = async ({searchParams}: OrdersPageProps) => {
       orderProducts: {
         include: {
           product: true,
-        }
-      }
+        },
+      },
     }
   })
   return (<><OrdersList orders={orders} /></>)
