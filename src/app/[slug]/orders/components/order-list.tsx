@@ -1,11 +1,14 @@
+"use server"
+
 import { OrderStatus, Prisma } from "@prisma/client";
-import { ChevronLeftIcon, ScrollTextIcon } from "lucide-react";
+import { ScrollTextIcon } from "lucide-react";
 import Image from "next/image";
 
 import { formatCurrency } from "@/app/helpers/format-currency";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+
+import GoBackBtn from "./back-btn";
 
 interface OrdersListProps {
   orders: Prisma.OrderGetPayload<{
@@ -33,11 +36,10 @@ const statusLabel = (status: OrderStatus) => {
   return ""
 }
 const OrdersList = ({orders}: OrdersListProps) => {
+  
   return ( 
     <div className="space-y-6 p-6">
-      <Button size="icon" variant="secondary" className="rounded-full"> 
-        <ChevronLeftIcon />
-      </Button>
+     <GoBackBtn />
       <div className="flex items-center gap-3">
         <ScrollTextIcon />
         <h2 className="text-lg font-semibold">Meus Pedidos</h2>
@@ -46,7 +48,12 @@ const OrdersList = ({orders}: OrdersListProps) => {
         orders.map(order => (
           <Card key={order.id}>
             <CardContent className="space-y-4 p-5">
-              <div className={`w-fit rounded-full px-2 py-1 text-xs font-semibold text-white ${order.status === OrderStatus.FINISHED ? "bg-green-400" : "bg-gray-200 text-gray-500"}`}>
+              <div className={`w-fit rounded-full px-2 py-1 text-xs font-semibold text-white 
+                ${order.status === OrderStatus.FINISHED ? "bg-green-400" : 
+                    order.status === OrderStatus.IN_PREPARATION ? "bg-yellow-300" :
+                    order.status === OrderStatus.CANCELLED ? "bg-red-400" :
+                  "bg-gray-400 text-gray-500"}`
+              }>
                 {statusLabel(order.status)}
               </div>
               <div className="flex items-center gap-2">
@@ -64,7 +71,7 @@ const OrdersList = ({orders}: OrdersListProps) => {
                 <div className="space-y-2">
                   {order.orderProducts.map(orderProduct =>  (
                   <div key={orderProduct.id} className="flex items-center gap-2">
-                    <div className="h-5 w-5 flex items-center justify-center rounded-full bg-gray-400 text-white bg-muted text-xs font-semibold">
+                    <div className="h-5 w-5 flex items-center justify-center rounded-full bg-gray-700 text-white bg-muted text-xs font-semibold">
                       {orderProduct.quantity}
                     </div>
                     <p className="text-sm">{orderProduct.product.name}</p>

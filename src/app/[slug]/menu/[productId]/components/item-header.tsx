@@ -11,13 +11,14 @@ import { Button } from "@/components/ui/button";
 
 
 interface ProductHeaderProps {
+  slug: string,
   product: Pick<Product, 'name' | 'imageUrl'>
 }
 
-const ProductHeader = ({ product }: ProductHeaderProps) => {
+const ProductHeader = ({ product, slug }: ProductHeaderProps) => {
   const router = useRouter()
-  // const [pressed, setPressed] = useState<boolean>(false)
   const handleBackClick = () => router.back()
+  const handleOrdersClick = () => router.push(`/${slug}/orders`)
 
   return (  
   <div className="relative min-h-[300px] w-full">
@@ -32,18 +33,17 @@ const ProductHeader = ({ product }: ProductHeaderProps) => {
     <Image 
       src={product?.imageUrl} 
       alt={product?.name}
-      className="object-contain 0 z-10 bg-gray-100" 
+      className="object-contain 0 z-10 bg-purple-100" 
       fill
     />
     <Button 
       variant="secondary" 
       size="icon" 
       className="absolute right-4 top-4 z-50 rounded-full"
-      onClick={handleBackClick}
+      onClick={handleOrdersClick}
 
     >
       <ScrollTextIcon />
-      {/* {pressed && <CpfForm />}  depois nos faz essa*/}
     </Button>
     
   

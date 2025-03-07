@@ -47,7 +47,7 @@ const CpfForm = () => {
     router.back()
   }
   const onSubmit = (data: FormSchema) => {
-    router.push(`${pathname}?cpf=${removePoints(data.cpf)}`)
+    router.replace(`${pathname}?cpf=${removePoints(data.cpf)}`)
   }
 
   return (

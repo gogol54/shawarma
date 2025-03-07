@@ -3,12 +3,15 @@
 import { MenuCategory, Prisma } from "@prisma/client";
 import { ClockIcon, LockIcon } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useContext, useState } from "react";
 
+import { formatCurrency } from "@/app/helpers/format-currency";
 import { isOpen } from "@/app/helpers/is-open";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
+import { CartContext } from "../contexts/cart";
+import CartSheet from "./cart-sheet";
 import Products from "./products";
 
 interface RestaurantCategoriesProps {
@@ -25,6 +28,8 @@ const RestaurantCategories = ({restaurant}: RestaurantCategoriesProps) => {
   const handleCategoryClick = (category: MenuCategory) => {
     setSelectedCategory(category)
   }
+  const { products, total, totalQuantity, toggleCart } = useContext(CartContext)
+  
   const open = isOpen()
   const getCategoryBtn = (category: MenuCategory) => {
     return selectedCategory.id === category.id ? "default" : "secondary"
@@ -48,7 +53,7 @@ const RestaurantCategories = ({restaurant}: RestaurantCategoriesProps) => {
           {open ? (
             <div className="flex items-center gap-1 text-green-500">
               <ClockIcon size={12} />
-              <p>Aberto!</p>
+              <p className="font-semibold text-lg">Aberto até às 23:59!</p>
             </div>
           ) : (
             <div className="flex items-center gap-1 text-red-500">
@@ -78,8 +83,22 @@ const RestaurantCategories = ({restaurant}: RestaurantCategoriesProps) => {
         <ScrollBar orientation="horizontal"/>
       </ScrollArea>
       <h3 className="font-semibold px-5 pt-8">{selectedCategory.name}</h3>
-       {<Products products={selectedCategory.products}/>
-      }
+      <Products products={selectedCategory.products}/>
+      {products.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 flex w-full items-center justify-between boder border-t bg-white px-5 py-3">
+          <div className="">
+            <p className="text-xs text-muted-foreground">Total dos pedidos</p>
+            <p className="text-sm font-semibold">
+              {formatCurrency(total)} 
+              <span className="text-xs font-normal text-muted-foreground">
+                / {totalQuantity} {totalQuantity > 1 ? 'itens' : 'item'}
+                </span> 
+            </p>
+          </div>
+          <Button onClick={toggleCart}>Ver sacola</Button>
+          <CartSheet />
+        </div>
+      )}
     </div>
     );
 }

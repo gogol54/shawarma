@@ -34,12 +34,16 @@ const CartSheet = () => {
           </div>
           <Card className="mb-6">
             <CardContent className="p-5">
+            {consumptionMethod === 'takeaway' && <div className="flex justify-between">
+                <p className="text-sm text-muted-foreground">Valor </p>
+                <p className="font-semibold text-sm">{formatCurrency(total)}</p>
+              </div>}
               {consumptionMethod === 'takeaway' && <div className="flex justify-between">
                 <p className="text-sm text-muted-foreground">Entrega </p>
                 <p className="font-semibold text-sm">{formatCurrency(8)}</p>
               </div>}
               <div className="flex justify-between">
-                <p className="text-sm text-muted-foreground">Total</p>
+                <p className="text-sm text-muted-foreground">Total </p>
                 <p className="font-semibold text-sm">{consumptionMethod === 'takeaway' ? formatCurrency(total + 8) : formatCurrency(total)}</p>
               </div>
             </CardContent>

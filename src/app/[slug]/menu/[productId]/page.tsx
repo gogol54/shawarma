@@ -10,7 +10,7 @@ interface ProductPageProps {
 }
 
 const ProductPage = async ({params}: ProductPageProps) => {
-  const {slug, productId} = await params;
+  const { slug, productId } = await params;
   const product = await db.product.findUnique({
     where: {
       id: productId
@@ -34,7 +34,7 @@ const ProductPage = async ({params}: ProductPageProps) => {
 
   return (
     <div className="flex flex-col h-full">
-    <ProductHeader product={product}/>
+    <ProductHeader product={product} slug={slug}/>
     <ProductDetails product={product}/>
     </div>)
 }

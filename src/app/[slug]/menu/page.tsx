@@ -32,7 +32,7 @@ const RestaurantMenuPage = async ({params, searchParams}: RestaurantMenuProps) =
   }
   return (
     <div>
-      <RestaurantHeader restaurant={restaurant} />      
+      <RestaurantHeader restaurant={restaurant} slug={slug} />      
       <RestaurantCategories restaurant={restaurant} />
     </div>
   )
