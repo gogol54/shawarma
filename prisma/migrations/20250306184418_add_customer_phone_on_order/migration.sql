@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "Order" ADD COLUMN     "customerPhone" TEXT NOT NULL DEFAULT '0000000000';

@@ -55,11 +55,12 @@ const ProductDetails = ({product}: ProductDetailsProps) => {
           <Image 
             src={product.restaurant.avatarImageUrl}
             alt={product. restaurant.name}
-            width={16}
-            height={16}
+            width={25}
+            height={25}
+            quality={100}
             className="rounded-full"
           />
-          <p className="text-xs text-muted-foreground">
+          <p className="text-lg text-muted-foreground">
             {product.restaurant.name}
           </p>
         </div>

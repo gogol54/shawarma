@@ -37,12 +37,14 @@ const RestaurantCategories = ({restaurant}: RestaurantCategoriesProps) => {
   return (
     <div className="relative z-50 mt-[-1.5rem] rounded-t-3xl bg-white ">
       <div className="p-5">
-        <div className="flex items-center gap-3 ">
+        <div className="flex items-center gap-2 ">
           <Image 
             src={restaurant.avatarImageUrl} 
             alt={restaurant.name}
             width={45} 
             height={45} 
+            quality={100}
+            className="object-cover rounded-lg"
           />
           <div>
             <h2 className="text-lg font-semibold">{restaurant.name}</h2>

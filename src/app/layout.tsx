@@ -13,7 +13,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Donalds Clone",
+  title: "Shawarma Rosul",
   description: "Apenas Alimentação!",
 };
 
