@@ -103,7 +103,7 @@ const ProductDetails = ({product}: ProductDetailsProps) => {
               <h4 className="font-semibold">Ingredientes</h4>
             </div>
             <ul className="list-disc px-5 text-sm text-muted-foreground">
-              {product.ingredients.map(item => (
+              {product?.ingredients?.map(item => (
                 <li key={item} >
                   {item}
                 </li>
