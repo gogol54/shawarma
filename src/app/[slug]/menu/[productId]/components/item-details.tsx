@@ -51,7 +51,7 @@ const ProductDetails = ({product}: ProductDetailsProps) => {
 
   // Garantir que product.ingredients seja um array
   const ingredients = Array.isArray(product.ingredients) ? product.ingredients : [];
-
+  
   return (
     <>
       <div className="relative z-50 mt-[-1.5rem] overflow-hidden rounded-t-3xl p-5 bg-white flex-auto flex-col flex">
@@ -109,12 +109,12 @@ const ProductDetails = ({product}: ProductDetailsProps) => {
                 <h4 className="font-semibold">Ingredientes</h4>
               </div>
               <ul className="list-disc px-5 text-sm text-muted-foreground">
-                {
+                {ingredients.length > 0 ? (
                   ingredients.map((item, index) => (
                     <li key={index}>
                       {item}
                     </li>
-                  )
+                  ))
                 ) : (
                   <p>Nenhum ingrediente listado!</p>
                 )}
