@@ -15,6 +15,9 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "Shawarma Rosul",
   description: "Apenas Alimentação!",
+  icons: {
+    icon: '/public/other.png',
+  },
 };
 
 export default function RootLayout({
@@ -24,6 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <link rel="icon" href="https://firebasestorage.googleapis.com/v0/b/facilitastorage.appspot.com/o/shawarma%2Ficon-none-resize.png?alt=media&token=4a604c9c-3d6e-4aab-b86d-384195f034e4" sizes="any" />
       <body className={`${poppins.className} antialiased`}>
         <Script src="https://sdk.mercadopago.com/js/v2" strategy="beforeInteractive" />
         <CartProvider>

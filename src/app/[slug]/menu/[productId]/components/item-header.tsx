@@ -33,7 +33,7 @@ const ProductHeader = ({ product, slug }: ProductHeaderProps) => {
     <Image 
       src={product?.imageUrl} 
       alt={product?.name}
-      className="object-contain 0 z-10 bg-purple-100" 
+      className="object-contain 0 z-10 bg-[#F6E7C5]" 
       fill
     />
     <Button 
