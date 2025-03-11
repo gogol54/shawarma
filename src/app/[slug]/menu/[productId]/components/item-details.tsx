@@ -104,8 +104,8 @@ const ProductDetails = ({product}: ProductDetailsProps) => {
             </div>
             <ul className="list-disc px-5 text-sm text-muted-foreground">
             {product?.ingredients && Array.isArray(product?.ingredients) ? (
-                product.ingredients.map(item => (
-                  <li key={item}>{item}</li>
+                product.ingredients.map((item, index) => (
+                  <li key={String(item) || index}>{item}</li>
                 ))
               ) : (
               <p>Nenhum ingrediente listado!</p>
