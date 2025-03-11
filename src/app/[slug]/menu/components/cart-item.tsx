@@ -1,3 +1,5 @@
+"use client"
+
 import { ChevronLeftIcon, ChevronRightIcon, TrashIcon } from "lucide-react";
 import Image from "next/image";
 import { useContext } from "react";
