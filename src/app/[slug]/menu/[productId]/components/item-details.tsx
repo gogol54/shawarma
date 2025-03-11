@@ -112,7 +112,7 @@ const ProductDetails = ({product}: ProductDetailsProps) => {
                 {ingredients.length > 0 ? (
                   ingredients.map((item, index) => (
                     <li key={index}>
-                      {item}
+                      {typeof item === 'string' || typeof item === 'number' ? item : JSON.stringify(item)}
                     </li>
                   ))
                 ) : (
