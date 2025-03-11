@@ -60,16 +60,13 @@ export const CartProvider = ({children} : {children: ReactNode}) => {
   const increaseProductQuantity = (productId: string) => {
     setProducts((prevs) => {
       return prevs.map((item) => {
-        if(item.id !== productId){
-          return item
+        if (item.id !== productId) {
+          return item;
         }
-        if (item.id === productId) {
-          return { ...item, quantity: item.quantity + 1 };
-        }
-
+        return { ...item, quantity: item.quantity + 1 };
       });
-    })
-  }
+    });
+  };
   
   const toggleCart = () => {
     setIsOpen((prev) => !prev)

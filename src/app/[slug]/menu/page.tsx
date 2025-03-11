@@ -27,7 +27,8 @@ const RestaurantMenuPage = async ({params, searchParams}: RestaurantMenuProps) =
       },
     }
   })
-  if(!isConsumptionMethodValid(consumptionMethod)){
+  
+  if(!restaurant || !isConsumptionMethodValid(consumptionMethod)){
     return notFound()
   }
   return (

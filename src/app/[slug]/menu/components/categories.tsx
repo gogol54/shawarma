@@ -18,16 +18,22 @@ interface RestaurantCategoriesProps {
   restaurant: Prisma.RestaurantGetPayload<{
     include: {
       menuCategories: {
-        include: { products: true},
+        include: { 
+          products: 
+          true
+        },
       },
     },
   }>
 }
+
+
 const RestaurantCategories = ({restaurant}: RestaurantCategoriesProps) => {
   const [selectedCategory, setSelectedCategory] = useState<MenuCategory>(restaurant.menuCategories[0])
   const handleCategoryClick = (category: MenuCategory) => {
     setSelectedCategory(category)
   }
+  
   const { products, total, totalQuantity, toggleCart } = useContext(CartContext)
   
   const open = isOpen()
@@ -85,7 +91,7 @@ const RestaurantCategories = ({restaurant}: RestaurantCategoriesProps) => {
         <ScrollBar orientation="horizontal"/>
       </ScrollArea>
       <h3 className="font-semibold px-5 pt-8">{selectedCategory.name}</h3>
-      <Products products={selectedCategory.products}/>
+      <Products products={restaurant.menuCategories[0].products}/>
       {products.length > 0 && (
         <div className="fixed bottom-0 left-0 right-0 flex w-full items-center justify-between boder border-t bg-white px-5 py-3">
           <div className="">
