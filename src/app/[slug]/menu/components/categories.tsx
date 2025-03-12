@@ -1,6 +1,6 @@
 'use client'
 
-import { MenuCategory, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { ClockIcon, LockIcon } from "lucide-react";
 import Image from "next/image";
 import { useContext, useState } from "react";
@@ -18,32 +18,34 @@ interface RestaurantCategoriesProps {
   restaurant: Prisma.RestaurantGetPayload<{
     include: {
       menuCategories: {
-        include: { 
-          products: 
-          true
-        },
+        include: { products: true },
       },
     },
   }>
 }
 
+const RestaurantCategories = ({ restaurant }: RestaurantCategoriesProps) => {
+  const { products, total, totalQuantity, toggleCart } = useContext(CartContext);
 
-const RestaurantCategories = ({restaurant}: RestaurantCategoriesProps) => {
-  const [selectedCategory, setSelectedCategory] = useState<MenuCategory>(restaurant.menuCategories[0])
-  const handleCategoryClick = (category: MenuCategory) => {
-    setSelectedCategory(category)
+  // Agora selecionamos a categoria inteira e não apenas o nome
+  const [selectedCategory, setSelectedCategory] = useState(
+    restaurant.menuCategories[0] || null
+  );
+
+  const handleCategoryClick = (category: typeof restaurant.menuCategories[0]) => {
+    setSelectedCategory(category);
   }
-  
-  const { products, total, totalQuantity, toggleCart } = useContext(CartContext)
-  
-  const open = isOpen()
-  const getCategoryBtn = (category: MenuCategory) => {
-    return selectedCategory.id === category.id ? "default" : "secondary"
+
+  const open = isOpen();
+
+  const getCategoryBtn = (category: string) => {
+    return selectedCategory?.name === category ? "default" : "secondary";
   }
+
   return (
-    <div className="relative z-50 mt-[-1.5rem] rounded-t-3xl bg-white ">
+    <div className="relative z-50 mt-[-1.5rem] rounded-t-3xl bg-white">
       <div className="p-5">
-        <div className="flex items-center gap-2 ">
+        <div className="flex items-center gap-2">
           <Image 
             src={restaurant.avatarImageUrl} 
             alt={restaurant.name}
@@ -71,36 +73,39 @@ const RestaurantCategories = ({restaurant}: RestaurantCategoriesProps) => {
           )}
         </div>
       </div>
-     
+
+      {/* Categorias */}
       <ScrollArea className="w-full">
         <div className="flex w-max space-x-4 p-4 pt-0">
-          {
-            restaurant.menuCategories.map((category) => ( 
-              <Button 
-                onClick={() => handleCategoryClick(category)}
-                key={category.id} 
-                variant={getCategoryBtn(category)}
-                size="sm" 
-                className="rounded-full"
-              >
-                {category.name}
-              </Button>
-            ))
-          }
+          {restaurant.menuCategories.map((category) => ( 
+            <Button 
+              onClick={() => handleCategoryClick(category)}
+              key={category.id} 
+              variant={getCategoryBtn(category.name)}
+              size="sm" 
+              className="rounded-full"
+            >
+              {category.name}
+            </Button>
+          ))}
         </div>
         <ScrollBar orientation="horizontal"/>
       </ScrollArea>
-      <h3 className="font-semibold px-5 pt-8">{selectedCategory.name}</h3>
-      <Products products={selectedCategory.products}/>
+
+      <h3 className="font-semibold px-5 pt-8">{selectedCategory?.name}</h3>
+
+      {/* Passamos os produtos da categoria corretamente */}
+      <Products products={selectedCategory?.products || []} />
+
       {products.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 flex w-full items-center justify-between boder border-t bg-white px-5 py-3">
-          <div className="">
+        <div className="fixed bottom-0 left-0 right-0 flex w-full items-center justify-between border-t bg-white px-5 py-3">
+          <div>
             <p className="text-xs text-muted-foreground">Total dos pedidos</p>
             <p className="text-sm font-semibold">
               {formatCurrency(total)} 
               <span className="text-xs font-normal text-muted-foreground">
                 / {totalQuantity} {totalQuantity > 1 ? 'itens' : 'item'}
-                </span> 
+              </span> 
             </p>
           </div>
           <Button onClick={toggleCart}>Ver sacola</Button>
@@ -108,7 +113,7 @@ const RestaurantCategories = ({restaurant}: RestaurantCategoriesProps) => {
         </div>
       )}
     </div>
-    );
+  );
 }
- 
+
 export default RestaurantCategories;
