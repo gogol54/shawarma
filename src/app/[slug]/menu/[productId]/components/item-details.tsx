@@ -67,7 +67,7 @@ const ProductDetails = ({product}: ProductDetailsProps) => {
               className="rounded-full"
             />
             <p className="text-lg text-muted-foreground">
-              {product.restaurant.name}
+              {product.restaurant.name} 
             </p>
           </div>
           {/* NOME DO PRODUTO */}
@@ -96,10 +96,10 @@ const ProductDetails = ({product}: ProductDetailsProps) => {
               </Button>
             </div>
           </div>
-          <ScrollArea className="h-full">
+          <ScrollArea className=" h-screen">
             {/* SOBRE */}
             <div className="mt-6 space-y-3">
-              <h4 className="font-semibold">Sobre</h4>
+              <h4 className="font-semibold">Sobre </h4>
               <p className="text-sm text-muted-foreground">{product.description}</p>
             </div>
             {/* INGREDIENTES */}
@@ -108,7 +108,7 @@ const ProductDetails = ({product}: ProductDetailsProps) => {
                 <ChefHatIcon size={18} />
                 <h4 className="font-semibold">Ingredientes</h4>
               </div>
-              <ul className="list-disc px-5 text-sm text-muted-foreground">
+              <ul className="list-disc px-5 text-sm text-muted-foreground mb-4">
                 {ingredients.length > 0 ? (
                   ingredients.map((item, index) => (
                     <li key={index}>

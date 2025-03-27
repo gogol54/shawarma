@@ -47,8 +47,9 @@ model Product {
   name           String
   description    String
   price          Float
+  inStock        Int           @default(25)
   imageUrl       String
-  ingredients    Json
+  ingredients    Json          
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 }
@@ -88,6 +89,7 @@ model OrderProduct {
   orderId   Int
   quantity  Int
   price     Float
+  dropIng   Json?    // Adicionando a coluna dropIng à tabela OrderProduct
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
