@@ -14,8 +14,9 @@ interface CreateOrderInput {
   products: Array<{
     id: string;
     quantity: number;
+    dropIng: string[];
   }>;
-  consumptionMethod: ConsumptionMethod; // Corrigido para camelCase
+  consumptionMethod: ConsumptionMethod; 
   slug: string;
 }
 
@@ -38,12 +39,27 @@ export const createOrder = async (input: CreateOrderInput) => {
     },
   });
 
+  // Verificando se o estoque é suficiente para todos os produtos
+  for (const item of input.products) {
+    const product = productsWithPrices.find((p) => p.id === item.id);
+    if (!product) {
+      throw new Error(`Produto com id ${item.id} não encontrado.`);
+    }
+
+    // Se o estoque do produto for menor que a quantidade pedida, lança erro
+    if (product.inStock < item.quantity) {
+      throw new Error(`Estoque insuficiente para o produto: ${item.id}. Disponível: ${product.inStock}`);
+    }
+  }
+
   const orderProductsValues = input.products.map((item) => ({
     productId: item.id,
     quantity: item.quantity,
+    dropIng: item.dropIng,
     price: productsWithPrices.find((p) => p.id === item.id)!.price,
   }));
 
+  // Criando o pedido
   await db.order.create({
     data: {
       consumptionMethod: input.consumptionMethod,
@@ -66,6 +82,20 @@ export const createOrder = async (input: CreateOrderInput) => {
       restaurantId: restaurant.id,
     },
   });
-  revalidatePath(`/${input.slug}/orders`)
-  redirect(`/${input.slug}/orders?cpf=${removePoints(input.customerCpf)}`)
+
+  // Atualizando o estoque de cada produto
+  for (const item of input.products) {
+    await db.product.update({
+      where: { id: item.id },
+      data: {
+        inStock: {
+          decrement: item.quantity, // Subtrai a quantidade comprada
+        },
+      },
+    });
+  }
+
+  // Revalidando a página e redirecionando para a lista de pedidos
+  revalidatePath(`/${input.slug}/orders`);
+  redirect(`/${input.slug}/orders?cpf=${removePoints(input.customerCpf)}`);
 };

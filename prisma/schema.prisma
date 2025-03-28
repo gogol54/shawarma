@@ -62,6 +62,7 @@ model Order {
   restaurant        Restaurant        @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   restaurantId      String
   orderProducts     OrderProduct[]
+  address           Json?
   customerName      String
   customerCpf       String
   customerPhone     String            @default("0000000000")
@@ -72,6 +73,7 @@ model Order {
 enum OrderStatus {
   PENDING
   IN_PREPARATION
+  DELIVERY
   FINISHED
   CANCELLED
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ConsumptionMethod } from "@prisma/client";
+import { ConsumptionMethod, Product } from "@prisma/client";
 import { Loader2Icon } from "lucide-react";
 import { useParams, useSearchParams } from "next/navigation";
 import { useContext, useTransition } from "react";
@@ -34,64 +34,83 @@ import { createOrder } from "../actions/create-order";
 import { CartContext } from "../contexts/cart";
 import { validateCPF } from "../helpers/cpf";
 
+// Definição do Schema
 const formSchema = z.object({
-  name: z.string().trim().min(1, {
-    message: "O nome é obrigatório.",
-  }),
-  cpf: z.string().trim().min(1, {
-    message: "O cpf é obrigatório."
-  }).refine((value) => validateCPF(value), {
-    message: "CPF inválido!",
-  }),
-  phone: z.string().trim().min(1, {
-    message: "O contato é obrigatório."
-  })
-})
-type FormSchema = z.infer<typeof formSchema>
+  name: z.string().trim().min(1, { message: "O nome é obrigatório." }),
+  cpf: z.string().trim().min(1, { message: "O cpf é obrigatório." }).refine((value) => validateCPF(value), { message: "CPF inválido!" }),
+  phone: z.string().trim().min(1, { message: "O contato é obrigatório." })
+});
 
-interface FinishOrderDialogProps{
+type FormSchema = z.infer<typeof formSchema>;
+
+interface FinishOrderDialogProps {
   open: boolean,
   onOpenChange: (open: boolean) => void,
 }
 
-const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
-  const search = useSearchParams()
-  const { products, clearCart } = useContext(CartContext)
-  const [isPending, startTransition] = useTransition()
-  const { slug } = useParams<{slug: string}>()
+const FinishDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
+  const search = useSearchParams();
+  const { products, clearCart } = useContext(CartContext);
+  const [isPending, startTransition] = useTransition();
+  const { slug } = useParams<{ slug: string }>();
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      cpf: "",
-      phone: "",
-    },
+    defaultValues: { name: "", cpf: "", phone: "" },
     shouldUnregister: true,
-  })
+  });
+
+  const sendOrderToWhatsApp = (data: FormSchema, products: Product, consumptionMethod: ConsumptionMethod) => {
+    // Formatação da mensagem para WhatsApp
+    const formattedProducts = products.map((product) => `🥙 *${product.name}* - ${product.quantity}x`).join("\n");
+    const message = encodeURIComponent(
+      `📢 *Novo Pedido Recebido!*\n\n` +
+      `👤 *Cliente:* ${data.name}\n` +
+      `📞 *Telefone:* ${data.phone}\n` +
+      `📍 *Método de Consumo:* ${consumptionMethod === "dine_in" ? "Buscar no Local" : "Entrega"}\n\n` +
+      `🛒 *Resumo do Pedido:*\n${formattedProducts}\n\n` +
+      `✅ Pedido confirmado e aguardando preparo!`
+    );
+    
+    // Número do WhatsApp do restaurante (ou responsável)
+    const whatsappNumber = "+55" + "55981376693"; // Certifique-se de que o número está correto, sem espaços, parênteses ou traços.
+  
+    // Gerando a URL para abrir o WhatsApp com a mensagem
+    const whatsappURL = `https://wa.me/${whatsappNumber}?text=${message}`;
+  
+    // Redireciona o cliente para o WhatsApp para enviar a mensagem
+    window.open(whatsappURL, "_blank");  // Abre o WhatsApp em uma nova aba ou aplicativo
+  };
+
   const onSubmit = async (data: FormSchema) => {
     try {
-      startTransition( async () => {
+      startTransition(async () => {
         const consumptionMethod = search.get("consumptionMethod") as ConsumptionMethod;
+        // Cria a ordem
         await createOrder({
           consumptionMethod,
           customerCpf: data.cpf,
           customerName: data.name,
           customerPhone: data.phone,
           products,
-          slug 
-        })
-        clearCart()
-        onOpenChange(false)
-        toast.success("Agradecemos pela preferência, agora é só esperar!")
-      })
-    } catch (error) {
-      toast.error("Algum erro foi encontrado, tente novamente!")
-      console.log(error)
-    }
-  }
+          slug
+        });
+        clearCart();
+        onOpenChange(false);
 
-  return ( 
+        // Envia o pedido para o WhatsApp
+        sendOrderToWhatsApp(data, products, consumptionMethod);
+
+        // Exibe o toast de sucesso
+        toast.success("Agradecemos pela preferência, agora é só esperar!");
+      });
+    } catch (error) {
+      toast.error("Algum erro foi encontrado, tente novamente!");
+      console.log(error);
+    }
+  };
+
+  return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerTrigger asChild>
       </DrawerTrigger>
@@ -127,7 +146,7 @@ const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
                         placeholder="(55)988025159"
                         format="(##)#####-####"
                         customInput={Input}
-                        {...field} 
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -145,7 +164,7 @@ const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
                         placeholder="Digite seu CPF..."
                         format="###.###.###-##"
                         customInput={Input}
-                        {...field} 
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -153,9 +172,9 @@ const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
                 )}
               />
               <DrawerFooter>
-                <Button 
-                  type="submit" 
-                  variant="destructive" 
+                <Button
+                  type="submit"
+                  variant="destructive"
                   className="rounded-full"
                   disabled={isPending}
                 >
@@ -163,10 +182,7 @@ const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
                   Finalizar
                 </Button>
                 <DrawerClose asChild>
-                  <Button 
-                    variant="outline" 
-                    className="rounded-full w-full"
-                  >
+                  <Button variant="outline" className="rounded-full w-full">
                     Cancelar
                   </Button>
                 </DrawerClose>
@@ -174,14 +190,9 @@ const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
             </form>
           </Form>
         </div>
-        
-        
       </DrawerContent>
     </Drawer>
-   );
-}
+  );
+};
 
-
-
- 
 export default FinishDialog;

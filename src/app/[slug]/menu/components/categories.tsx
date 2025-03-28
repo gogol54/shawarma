@@ -95,7 +95,7 @@ const RestaurantCategories = ({ restaurant }: RestaurantCategoriesProps) => {
       <h3 className="font-semibold px-5 pt-8">{selectedCategory?.name}</h3>
 
       {/* Passamos os produtos da categoria corretamente */}
-      <Products products={selectedCategory?.products || []} />
+      <Products products={selectedCategory?.products.filter(product => product.inStock > 0) || []} />
 
       {products.length > 0 && (
         <div className="fixed bottom-0 left-0 right-0 flex w-full items-center justify-between border-t bg-white px-5 py-3">

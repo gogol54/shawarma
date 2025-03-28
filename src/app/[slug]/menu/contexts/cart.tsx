@@ -3,8 +3,9 @@
 import { Product } from "@prisma/client";
 import { createContext, ReactNode, useState } from "react";
 
-export interface CartProduct extends Pick<Product, "id" | "name" | "imageUrl" | "price">{
+export interface CartProduct extends Pick<Product, "id" | "name" | "imageUrl" | "price" | "inStock" >{
   quantity: number;
+  dropIng: string[];
 }
 
 export interface ICartContext {
@@ -43,29 +44,31 @@ export const CartProvider = ({children} : {children: ReactNode}) => {
     return acc + product.quantity 
   }, 0)
 
-  const decreaseProductQuantity = (productId: string) => {
+  const decreaseProductQuantity = (productId: string, dropIng: string[]) => {
     setProducts((prevs) => {
       return prevs.map((item) => {
-        if (item.quantity === 1) {
-          return { ...item, quantity: 1 };
-        }
-        if (item.id !== productId) {
-          return item
+        // Verifica se o produto é o correto, considerando o ID e os ingredientes removidos
+        if (item.quantity === 1 || item.id !== productId || JSON.stringify(item.dropIng) !== JSON.stringify(dropIng)) {
+          return item;
         }
         return { ...item, quantity: item.quantity - 1 };
       });
-    })
-  }
+    });
+  };
 
-  const increaseProductQuantity = (productId: string) => {
-    setProducts((prevs) => {
-      return prevs.map((item) => {
-        if (item.id !== productId) {
+  const increaseProductQuantity = (productId: string, dropIng: string[]) => {
+    setProducts((prevs) =>
+      prevs.map((item) => {
+        if (item.id !== productId || JSON.stringify(item.dropIng) !== JSON.stringify(dropIng)) {
           return item;
         }
-        return { ...item, quantity: item.quantity + 1 };
-      });
-    });
+        // Garantir que a quantidade não ultrapasse o estoque
+        if (item.quantity < item.inStock) {
+          return { ...item, quantity: item.quantity + 1 };
+        }
+        return item;
+      })
+    );
   };
   
   const toggleCart = () => {
@@ -81,24 +84,25 @@ export const CartProvider = ({children} : {children: ReactNode}) => {
   };
 
   const addProduct = (product: CartProduct) => {
-    const productIsAlreadyOnTheCart = products.some(item => item.id === product.id)
-   
-    if(!productIsAlreadyOnTheCart){
-      return setProducts((prev) => [...prev, product])
-    }
-
     setProducts((prevProducts) => {
-      return prevProducts.map((item) => {
-        if (item.id === product.id) {
-          return {
-            ...item,
-            quantity: item.quantity + product.quantity,
-          };
-        }
-        return item
-      });
-    })
-  }
+      const existingProduct = prevProducts.find(
+        (item) => item.id === product.id && JSON.stringify(item.dropIng) === JSON.stringify(product.dropIng)
+      );
+  
+      if (existingProduct) {
+        // Garante que a quantidade total não ultrapasse o inStock
+        const newQuantity = existingProduct.quantity + product.quantity;
+        return prevProducts.map((item) =>
+          item.id === product.id && JSON.stringify(item.dropIng) === JSON.stringify(product.dropIng)
+            ? { ...item, quantity: newQuantity > item.inStock ? item.inStock : newQuantity }
+            : item
+        );
+      } else {
+        // Garante que o novo produto adicionado não ultrapasse o inStock
+        return [...prevProducts, { ...product, quantity: Math.min(product.quantity, product.inStock) }];
+      }
+    });
+  };
   
   return (
     <CartContext.Provider
