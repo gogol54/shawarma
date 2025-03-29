@@ -31,6 +31,7 @@ interface OrdersListProps {
 const statusLabel = (status: OrderStatus) => {
   // if(status === 'DELIVERY') return "Saiu para entrega"
   if(status === "FINISHED") return "Entregue"
+  if(status === "DELIVERY") return "Saiu para entrega"
   if(status === "IN_PREPARATION") return "Em preparo"
   if(status === "PENDING") return "Pendente" 
   if(status === "CANCELLED") return "Cancelado"
@@ -49,8 +50,8 @@ const OrdersList = ({ orders }: OrdersListProps) => {
           <CardContent className="space-y-4 p-5">
             <div
               className={`w-fit rounded-full px-2 py-1 text-xs font-semibold text-[#434343] ${
-                order.status === OrderStatus.FINISHED
-                  ? "bg-muted text-foreground-muted"
+                order.status === OrderStatus.FINISHED || order.status === OrderStatus.DELIVERY
+                  ? "bg-green-500 text-foreground-muted"
                   : order.status === OrderStatus.IN_PREPARATION
                   ? "bg-yellow-300"
                   : order.status === OrderStatus.CANCELLED
