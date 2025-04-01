@@ -24,7 +24,7 @@ const CartSheet = () => {
   const [finishOrderDialogIsOpen, setFinishOrderDialogIsOpen] = useState<boolean>(false)
   return (
     <Sheet open={isOpen} onOpenChange={toggleCart}>
-      <SheetContent className="w-[80%]">
+      <SheetContent className="w-full max-w-[450px] mx-auto">
         <SheetHeader>
           <SheetTitle>Suas Compras</SheetTitle>
         </SheetHeader>

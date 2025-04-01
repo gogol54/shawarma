@@ -113,9 +113,12 @@ const ProductDetails = ({product}: ProductDetailsProps) => {
             </div>
             {/* INGREDIENTES */}
             <div className="mt-6 space-y-3">
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-2">
                 <ChefHatIcon size={18} />
-                <h4 className="font-semibold">Remover Ingredientes</h4>
+                <div className="flex flex-col">
+                  <h4 className="font-semibold">Remover Ingredientes</h4>
+                  <p className="text-sm text-muted-foreground">Selecione somente os itens que você deseja remover </p>
+                </div>
               </div>
               <ul className="px-5 text-sm text-muted-foreground mb-4 space-y-2">
                 {ingredients.length > 0 ? (

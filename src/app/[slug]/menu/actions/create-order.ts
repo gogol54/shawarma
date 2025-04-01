@@ -11,6 +11,7 @@ interface CreateOrderInput {
   customerName: string;
   customerCpf: string;
   customerPhone: string;
+  address: JSON; 
   products: Array<{
     id: string;
     quantity: number;
@@ -21,81 +22,91 @@ interface CreateOrderInput {
 }
 
 export const createOrder = async (input: CreateOrderInput) => {
-  const restaurant = await db.restaurant.findUnique({
-    where: {
-      slug: input.slug,
-    },
-  });
-
-  if (!restaurant) {
-    throw new Error("Restaurant Not Found!");
-  }
-
-  const productsWithPrices = await db.product.findMany({
-    where: {
-      id: {
-        in: input.products.map((product) => product.id),
+  try {
+    console.log('Iniciando a criação do pedido...', input);
+    const restaurant = await db.restaurant.findUnique({
+      where: {
+        slug: input.slug,
       },
-    },
-  });
+    });
 
-  // Verificando se o estoque é suficiente para todos os produtos
-  for (const item of input.products) {
-    const product = productsWithPrices.find((p) => p.id === item.id);
-    if (!product) {
-      throw new Error(`Produto com id ${item.id} não encontrado.`);
+    if (!restaurant) {
+      throw new Error("Restaurant Not Found!");
     }
 
-    // Se o estoque do produto for menor que a quantidade pedida, lança erro
-    if (product.inStock < item.quantity) {
-      throw new Error(`Estoque insuficiente para o produto: ${item.id}. Disponível: ${product.inStock}`);
-    }
-  }
-
-  const orderProductsValues = input.products.map((item) => ({
-    productId: item.id,
-    quantity: item.quantity,
-    dropIng: item.dropIng,
-    price: productsWithPrices.find((p) => p.id === item.id)!.price,
-  }));
-
-  // Criando o pedido
-  await db.order.create({
-    data: {
-      consumptionMethod: input.consumptionMethod,
-      status: "PENDING",
-      customerName: input.customerName,
-      customerCpf: removePoints(input.customerCpf),
-      customerPhone: removePoints(input.customerPhone),
-      orderProducts: {
-        createMany: {
-          data: orderProductsValues,
-        },
-      },
-      total: input.consumptionMethod === 'takeaway' ? orderProductsValues.reduce(
-        (acc, item) => acc + item.price * item.quantity,
-        0
-      ) + 8 : orderProductsValues.reduce(
-        (acc, item) => acc + item.price * item.quantity,
-        0
-      ),
-      restaurantId: restaurant.id,
-    },
-  });
-
-  // Atualizando o estoque de cada produto
-  for (const item of input.products) {
-    await db.product.update({
-      where: { id: item.id },
-      data: {
-        inStock: {
-          decrement: item.quantity, // Subtrai a quantidade comprada
+    // Obter os preços dos produtos
+    const productsWithPrices = await db.product.findMany({
+      where: {
+        id: {
+          in: input.products.map((product) => product.id),
         },
       },
     });
-  }
 
-  // Revalidando a página e redirecionando para a lista de pedidos
-  revalidatePath(`/${input.slug}/orders`);
-  redirect(`/${input.slug}/orders?cpf=${removePoints(input.customerCpf)}`);
+    // Verificar estoque suficiente para os produtos
+    for (const item of input.products) {
+      const product = productsWithPrices.find((p) => p.id === item.id);
+      if (!product) {
+        throw new Error(`Produto com id ${item.id} não encontrado.`);
+      }
+
+      if (product.inStock < item.quantity) {
+        throw new Error(`Estoque insuficiente para o produto: ${item.id}. Disponível: ${product.inStock}`);
+      }
+    }
+
+    // Mapear os produtos para a tabela de pedidos
+    const orderProductsValues = input.products.map((item) => ({
+      productId: item.id,
+      quantity: item.quantity,
+      dropIng: item.dropIng,
+      price: productsWithPrices.find((p) => p.id === item.id)!.price,
+    }));
+
+    // Criar o pedido no banco de dados
+    await db.order.create({
+      data: {
+        consumptionMethod: input.consumptionMethod,
+        status: "PENDING",
+        customerName: input.customerName,
+        customerCpf: removePoints(input.customerCpf),
+        customerPhone: removePoints(input.customerPhone),
+        address: JSON.stringify(input.address),  // Convertendo o objeto em JSON
+        orderProducts: {
+          createMany: {
+            data: orderProductsValues,
+          },
+        },
+        total: input.consumptionMethod === 'takeaway' ? orderProductsValues.reduce(
+          (acc, item) => acc + item.price * item.quantity,
+          0
+        ) + 8 : orderProductsValues.reduce(
+          (acc, item) => acc + item.price * item.quantity,
+          0
+        ),
+        restaurantId: restaurant.id,
+      },
+    });
+
+    console.log('Pedido criado com sucesso. Atualizando estoque...');
+
+    // Atualizar o estoque de cada produto
+    for (const item of input.products) {
+      await db.product.update({
+        where: { id: item.id },
+        data: {
+          inStock: {
+            decrement: item.quantity, // Subtrai a quantidade comprada
+          },
+        },
+      });
+    }
+
+    console.log('Estoque atualizado. Revalidando a página e redirecionando...');
+  
+  } catch (error) {
+    console.error('Erro ao criar pedido:', error);
+    throw new Error('Erro ao criar pedido. Tente novamente!');
+  }
 };
+
