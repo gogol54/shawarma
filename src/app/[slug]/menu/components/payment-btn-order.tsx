@@ -76,18 +76,23 @@ const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
     try {
       startTransition(async () => {
         const consumptionMethod = search.get("consumptionMethod") as ConsumptionMethod;
-        await createOrder({
+        const response = await createOrder({
           consumptionMethod,
           customerCpf: data.cpf,
           customerName: data.name,
           customerPhone: data.phone,
           address: data.address,
           products,
-          slug: JSON.stringify(slug),
+          slug: slug,
         });
         clearCart();
         onOpenChange(false);
         toast.success("Agradecemos pela preferência, agora é só esperar!");
+        if (response.redirectUrl) {
+          window.location.href = response.redirectUrl; // 🔹 Redireciona para o Mercado Pago
+        } else {
+          toast.error("Erro ao redirecionar para o pagamento.");
+        }
       });
     } catch (error) {
       toast.error("Algum erro foi encontrado, tente novamente!");
