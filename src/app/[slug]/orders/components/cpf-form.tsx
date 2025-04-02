@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { PatternFormat } from 'react-number-format'
 import z from 'zod'
-
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Drawer,
@@ -25,19 +25,16 @@ import {
   FormMessage,
  } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { removePoints } from '../../menu/helpers/cpf'
 
- import { removePoints, validateCPF } from '../../menu/helpers/cpf'
-
-const formSchema = z.object({
-  cpf: z.string().trim().min(1, {
-    message: "O cpf é obrigatório."
-  }).refine((value) => validateCPF(value), {
-    message: "CPF inválido!",
+const formSchema = z.object({   
+  phone: z.string().trim().min(1, { 
+    message: "O contato é obrigatório." 
   })
 })
 type FormSchema = z.infer<typeof formSchema>;
 
-const CpfForm = () => {
+const PhoneForm = () => {
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema)
   })
@@ -47,9 +44,9 @@ const CpfForm = () => {
     router.back()
   }
   const onSubmit = (data: FormSchema) => {
-    router.replace(`${pathname}?cpf=${removePoints(data.cpf)}`)
+    router.replace(`${pathname}?phone=${removePoints(data.phone)}`)
   }
-
+ 
   return (
     <Drawer open>
       <DrawerContent>
@@ -61,14 +58,14 @@ const CpfForm = () => {
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <FormField
               control={form.control}
-              name="cpf"
+              name="phone"
               render={({ field }) => (
                 <FormItem className='px-4'>
-                  <FormLabel>Digite seu CPF</FormLabel>
+                  <FormLabel>Coloque o número do seu celular</FormLabel>
                   <FormControl>
                     <PatternFormat
-                      placeholder="Digite seu CPF..."
-                      format="###.###.###-##"
+                      placeholder="ex: (55)99611-1234"
+                      format="(##)#####-####"
                       customInput={Input}
                       {...field} 
                     />
@@ -102,4 +99,4 @@ const CpfForm = () => {
   )
 }
 
-export default CpfForm
+export default PhoneForm

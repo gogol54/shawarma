@@ -32,8 +32,9 @@ export default function RootLayout({
         <Script src="https://sdk.mercadopago.com/js/v2" strategy="beforeInteractive" />
         <CartProvider>
           {children}
-          <Toaster />
         </CartProvider>
+        <Toaster />
+
       </body>
       
     </html>

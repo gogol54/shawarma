@@ -83,7 +83,7 @@ const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
           customerPhone: data.phone,
           address: data.address,
           products,
-          slug,
+          slug: JSON.stringify(slug),
         });
         clearCart();
         onOpenChange(false);

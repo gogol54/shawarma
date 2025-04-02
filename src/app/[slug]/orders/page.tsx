@@ -3,26 +3,24 @@
 import { db } from "@/lib/prisma";
 
 import { removePoints, validateCPF } from "../menu/helpers/cpf";
-import CpfForm from "./components/cpf-form";
+import PhoneForm from "./components/cpf-form";
 import OrdersList from "./components/order-list";
 
 interface OrdersPageProps {
-  searchParams: Promise<{cpf: string}>
+  searchParams: Promise<{phone: string}>
 }
 const OrdersPage = async ({searchParams}: OrdersPageProps) => {
-  const { cpf } = await searchParams;
-  if(!cpf){
-    return <CpfForm />
+  const { phone } = await searchParams;
+  if(!phone){
+    return <PhoneForm/>
   }
-  if(!validateCPF(cpf)){
-    return <CpfForm />
-  }
+
   const orders = await db.order.findMany({
     orderBy: {
       createdAt: 'desc',
     },
     where: {
-      customerCpf: removePoints(cpf)
+      customerPhone: removePoints(phone)
     },
     include: {
       restaurant: {
@@ -38,6 +36,9 @@ const OrdersPage = async ({searchParams}: OrdersPageProps) => {
       },
     }
   })
+  if(!orders.length){
+    return <PhoneForm/>
+  }
   return (<><OrdersList orders={orders} /></>)
 
 }
