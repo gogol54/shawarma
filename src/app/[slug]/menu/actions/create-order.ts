@@ -14,10 +14,16 @@ interface CreateOrderInput {
   customerName: string;
   customerCpf: string;
   customerPhone: string;
-  address: JSON; 
+  address: { 
+    street: string; 
+    number: string; 
+    complement: string; 
+    zone: string; 
+  },
   products: Array<{
     id: string;
     name: string;
+    menuCategoryId: string;
     quantity: number;
     dropIng: string[];
   }>;
@@ -67,14 +73,14 @@ export const createOrder = async (input: CreateOrderInput) => {
   }));
 
   // Criar o pedido no banco de dados
-  await db.order.create({
+  const orderResponse = await db.order.create({
     data: {
       consumptionMethod: input.consumptionMethod,
       status: "PENDING",
       customerName: input.customerName,
       customerCpf: removePoints(input.customerCpf),
       customerPhone: removePoints(input.customerPhone),
-      address: JSON.stringify(input.address),  // Convertendo o objeto em JSON
+      address: input.address,  // Convertendo o objeto em JSON
       orderProducts: {
         createMany: {
           data: orderProductsValues,
@@ -91,7 +97,8 @@ export const createOrder = async (input: CreateOrderInput) => {
     },
   });
 
-  console.log('Pedido criado com sucesso. Atualizando estoque...');
+  if(orderResponse)
+    console.log('Pedido criado com sucesso. Atualizando estoque...', orderResponse);
 
   // Atualizar o estoque de cada produto
   for (const item of input.products) {
@@ -115,6 +122,7 @@ export const createOrder = async (input: CreateOrderInput) => {
           return {
             id: item.id,
             title: `Produto: ${item.quantity} ${item.name}`,
+            category_id: item.menuCategoryId,
             quantity: item.quantity,
             currency_id: "BRL",
             unit_price: product.price,
@@ -132,20 +140,34 @@ export const createOrder = async (input: CreateOrderInput) => {
             ]
           : []),
       ],
+
       payer: {
         name: input.customerName,
         phone: {
           area_code: "55",
           number: removePoints(input.customerPhone),
         },
+        identification: {
+          number: input.customerCpf,
+          type: 'CPF'
+        },
+        address: {
+          zip_code: '97590-000',
+          street_name: input.address.street,
+          street_number: input.address.complement ? 
+            input.address.number.concat(', ').concat(input.address.complement) :
+            input.address.number
+        },
+        date_created: JSON.stringify(orderResponse.createdAt)
       },
       back_urls: {
-        success: `${process.env.NEXT_PUBLIC_BASE_URL}/${input.slug}/orders?phone=${removePoints(input.customerPhone)}`,
+        success: `${process.env.NEXT_PUBLIC_BASE_URL}/${input.slug}/orders?phone=${removePoints(input.customerPhone)}&clean=true`,
         failure: `${process.env.NEXT_PUBLIC_BASE_URL}/${input.slug}/checkout?status=failure`,
-        pending: `${process.env.NEXT_PUBLIC_BASE_URL}/${input.slug}/checkout?status=pending`,
+        pending: `${process.env.NEXT_PUBLIC_BASE_URL}/${input.slug}/checkout?status=pending&phone=${removePoints(input.customerPhone)}&clean=true`, 
       },
       auto_return: "approved",
-      notification_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/mercadopago-webhook`,
+      notification_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/mercadopago-webhoock`,
+      external_reference: JSON.stringify(orderResponse.id)
     },
   });
 

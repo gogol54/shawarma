@@ -60,6 +60,7 @@ const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
   const { products, clearCart } = useContext(CartContext);
   const [isPending, startTransition] = useTransition();
   const { slug } = useParams();
+  const safeSlug = Array.isArray(slug) ? slug[0] : slug ?? "";
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -81,9 +82,14 @@ const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
           customerCpf: data.cpf,
           customerName: data.name,
           customerPhone: data.phone,
-          address: data.address,
+          address: {
+            street: data.address.street || "",
+            number: data.address.number || "",
+            complement: data.address.complement || "",
+            zone: data.address.zone || "",
+          },    
           products,
-          slug: slug,
+          slug : safeSlug
         });
         clearCart();
         onOpenChange(false);

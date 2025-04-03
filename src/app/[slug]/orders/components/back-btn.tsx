@@ -15,7 +15,7 @@ export const GoBackBtn = () => {
   const handleBack = () => {
     toggleCart()
     clearCart()
-    router.back()
+    router.push('/rosul')
   }
 
   return (

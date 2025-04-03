@@ -18,10 +18,12 @@ interface OrdersListProps {
           name: true,
           avatarImageUrl: true
         },
+        
       },
       orderProducts: {
         include: {
-          product: true
+          product: true,
+          dropIng: true
         },
       },
     },
@@ -74,14 +76,23 @@ const OrdersList = ({ orders }: OrdersListProps) => {
             </div>
             <Separator />
             <div className="space-y-2">
-              {order.orderProducts.map((orderProduct) => (
-                <div key={orderProduct.id} className="flex items-center gap-2">
-                  <div className="h-5 w-5 flex items-center justify-center rounded-full bg-[#434343] text-white bg-muted text-xs font-semibold">
-                    {orderProduct.quantity}
+              {order.orderProducts.map((orderProduct) => {
+                const removedIngredients = Array.isArray(orderProduct.dropIng) && orderProduct.dropIng.length > 0
+                  ? ` S/ ${orderProduct.dropIng.join(", ")}`
+                  : "";
+
+                return (
+                  <div key={orderProduct.id} className="flex items-center gap-2">
+                    <div className="h-5 w-5 flex items-center justify-center rounded-full bg-[#434343] text-white bg-muted text-xs font-semibold">
+                      {orderProduct.quantity}
+                    </div>
+                    <p className="text-sm">
+                      {orderProduct.product.name}
+                      {removedIngredients && <span className="text-red-500">{removedIngredients}</span>}
+                    </p>
                   </div>
-                  <p className="text-sm">{orderProduct.product.name}</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
             <Separator />
             <p className="text-sm font-medium">{formatCurrency(order.total)}</p>
