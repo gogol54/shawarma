@@ -1,4 +1,5 @@
 "use server"
+
 import { NextApiRequest, NextApiResponse } from "next";
 
 import { db } from "@/lib/prisma";
@@ -38,4 +39,3 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
   return res.status(405).end();
 }
-
