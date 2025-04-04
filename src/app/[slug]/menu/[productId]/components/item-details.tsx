@@ -26,7 +26,7 @@ interface ProductDetailsProps {
 
 const ProductDetails = ({product}: ProductDetailsProps) => {
   const [quantity, setQuantity] = useState<number>(1)
-  const { toggleCart, addProduct } = useContext(CartContext)
+  const { addProduct, setIsOpen } = useContext(CartContext)
   const [dropIng, setDropIng] = useState<string[]>([]);
 
   // Função para alternar a remoção de um ingrediente
@@ -55,7 +55,7 @@ const ProductDetails = ({product}: ProductDetailsProps) => {
       quantity,
       dropIng
     })
-    toggleCart()
+    setIsOpen(true)
   }
 
   // Garantir que product.ingredients seja um array
@@ -117,21 +117,23 @@ const ProductDetails = ({product}: ProductDetailsProps) => {
                 <ChefHatIcon size={18} />
                 <div className="flex flex-col">
                   <h4 className="font-semibold">Remover Ingredientes</h4>
-                  <p className="text-sm text-muted-foreground">Selecione somente os itens que você deseja remover </p>
+                  <p className="text-sm text-muted-foreground">Selecione somente os itens que você deseja remover ❌</p>
                 </div>
               </div>
               <ul className="px-5 text-sm text-muted-foreground mb-4 space-y-2">
                 {ingredients.length > 0 ? (
-                  ingredients.map((item, index) => (
-                    <li key={index} className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        className="w-4 h-4 cursor-pointer"
-                        checked={dropIng.includes(item)}
-                        onChange={() => toggleIngredient(item)}
-                      />
-                      {item}
-                    </li>
+                 ingredients
+                 .filter((item): item is string => typeof item === "string")
+                 .map((item, index) => (
+                   <li key={index} className="flex items-center gap-2">
+                     <input
+                       type="checkbox"
+                       className="w-4 h-4 cursor-pointer"
+                       checked={dropIng.includes(item)}
+                       onChange={() => toggleIngredient(item)}
+                     />
+                     {item}
+                   </li>
                   ))
                 ) : (
                   <p>Nenhum ingrediente listado!</p>

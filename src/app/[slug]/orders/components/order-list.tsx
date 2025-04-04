@@ -83,7 +83,7 @@ const OrdersList = ({ orders }: OrdersListProps) => {
 
                 return (
                   <div key={orderProduct.id} className="flex items-center gap-2">
-                    <div className="h-5 w-5 flex items-center justify-center rounded-full bg-[#ef4444] text-white bg-muted text-xs font-semibold">
+                    <div className="h-5 w-5 flex items-center justify-center rounded-full bg-red-500 text-white bg-muted text-xs font-semibold">
                       {orderProduct.quantity}
                     </div>
                     <p className="text-sm">

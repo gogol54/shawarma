@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/prisma";
 
-import { removePoints, validateCPF } from "../menu/helpers/cpf";
+import { removePoints } from "../menu/helpers/cpf";
 import PhoneForm from "./components/cpf-form";
 import OrdersList from "./components/order-list";
 

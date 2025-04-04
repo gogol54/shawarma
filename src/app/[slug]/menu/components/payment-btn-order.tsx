@@ -52,12 +52,13 @@ type FormSchema = z.infer<typeof formSchema>
 interface FinishOrderDialogProps{
   open: boolean,
   onOpenChange: (open: boolean) => void,
+  
 }
 
 
 const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
   const search = useSearchParams();
-  const { products, clearCart } = useContext(CartContext);
+  const { products, clearCart, setIsOpen, payOnDelivery } = useContext(CartContext);
   const [isPending, startTransition] = useTransition();
   const { slug } = useParams();
   const safeSlug = Array.isArray(slug) ? slug[0] : slug ?? "";
@@ -74,6 +75,7 @@ const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
   });
 
   const onSubmit = async (data: FormSchema) => {
+    setIsOpen(false);
     try {
       startTransition(async () => {
         const consumptionMethod = search.get("consumptionMethod") as ConsumptionMethod;
@@ -89,11 +91,12 @@ const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
             zone: data.address.zone || "",
           },    
           products,
-          slug : safeSlug
+          slug: safeSlug,
+          control: payOnDelivery
         });
         clearCart();
         onOpenChange(false);
-        toast.success("Agradecemos pela preferência, agora é só esperar!");
+        toast.success("Agradecemos pela preferência!");
         if (response.redirectUrl) {
           window.location.href = response.redirectUrl; // 🔹 Redireciona para o Mercado Pago
         } else {
@@ -166,7 +169,7 @@ const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
               )} />
               <DrawerFooter className="mt-auto">
                 <Button type="submit" color='green' disabled={isPending}>
-                  {isPending && <Loader2Icon className="animate-spin" />} Efetuar pagamento
+                  {isPending && <Loader2Icon className="animate-spin" />} Efetuar Compra
                 </Button>
                 <DrawerClose asChild>
                   <Button variant="destructive">Cancelar</Button>

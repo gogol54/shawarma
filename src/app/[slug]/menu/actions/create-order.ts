@@ -1,10 +1,13 @@
 "use server"
+
 import { ConsumptionMethod } from "@prisma/client";
 import { MercadoPagoConfig, Preference } from "mercadopago";
 
 const mercadopago = new MercadoPagoConfig({
   accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN!,
 });
+
+import { redirect } from "next/navigation";
 
 import { db } from "@/lib/prisma";
 
@@ -29,6 +32,7 @@ interface CreateOrderInput {
   }>;
   consumptionMethod: ConsumptionMethod; 
   slug: string;
+  control: boolean;
 }
 
 export const createOrder = async (input: CreateOrderInput) => {
@@ -111,67 +115,68 @@ export const createOrder = async (input: CreateOrderInput) => {
       },
     });
   }
-
-  const preference = new Preference(mercadopago);
-  const response = await preference.create({
-    body: {
-      items: [
-        ...input.products.map((item) => {
-          const product = productsWithPrices.find((p) => p.id === item.id);
-          if (!product) throw new Error(`Produto com id ${item.id} não encontrado.`);
-          return {
-            id: item.id,
-            title: `Produto: ${item.quantity} ${item.name}`,
-            category_id: item.menuCategoryId,
-            quantity: item.quantity,
-            currency_id: "BRL",
-            unit_price: product.price,
-          };
-        }),
-        ...(input.consumptionMethod === "takeaway"
-          ? [
-              {
-                id: "frete",
-                title: "Taxa de entrega",
-                quantity: 1,
-                currency_id: "BRL",
-                unit_price: 8, // Valor fixo da taxa de retirada
-              },
-            ]
-          : []),
-      ],
-
-      payer: {
-        name: input.customerName,
-        phone: {
-          area_code: "55",
-          number: removePoints(input.customerPhone),
-        },
-        identification: {
-          number: input.customerCpf,
-          type: 'CPF'
-        },
-        address: {
-          zip_code: '97590-000',
-          street_name: input.address.street,
-          street_number: input.address.complement ? 
-            input.address.number.concat(', ').concat(input.address.complement) :
-            input.address.number
-        },
-        date_created: JSON.stringify(orderResponse.createdAt)
-      },
-      back_urls: {
-        success: `${process.env.NEXT_PUBLIC_BASE_URL}/${input.slug}/orders?phone=${removePoints(input.customerPhone)}&clean=true`,
-        failure: `${process.env.NEXT_PUBLIC_BASE_URL}/${input.slug}/checkout?status=failure`,
-        pending: `${process.env.NEXT_PUBLIC_BASE_URL}/${input.slug}/checkout?status=pending&phone=${removePoints(input.customerPhone)}&clean=true`, 
-      },
-      auto_return: "approved",
-      notification_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/mercadopago-webhooks`,
-      external_reference: JSON.stringify(orderResponse.id)
-    },
-  });
-
-
   
-  return { redirectUrl: response.init_point };
+  if(input.control){
+    redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/${input.slug}/orders?phone=${removePoints(input.customerPhone)}&clean=true`)
+  } else { 
+    const preference = new Preference(mercadopago);
+    const response = await preference.create({
+      body: {
+        items: [
+          ...input.products.map((item) => {
+            const product = productsWithPrices.find((p) => p.id === item.id);
+            if (!product) throw new Error(`Produto com id ${item.id} não encontrado.`);
+            return {
+              id: item.id,
+              title: `Produto: ${item.quantity} ${item.name}`,
+              category_id: item.menuCategoryId,
+              quantity: item.quantity,
+              currency_id: "BRL",
+              unit_price: product.price,
+            };
+          }),
+          ...(input.consumptionMethod === "takeaway"
+            ? [
+                {
+                  id: "frete",
+                  title: "Taxa de entrega",
+                  quantity: 1,
+                  currency_id: "BRL",
+                  unit_price: 8, // Valor fixo da taxa de retirada
+                },
+              ]
+            : []),
+        ],
+  
+        payer: {
+          name: input.customerName,
+          phone: {
+            area_code: "55",
+            number: removePoints(input.customerPhone),
+          },
+          identification: {
+            number: input.customerCpf,
+            type: 'CPF'
+          },
+          address: {
+            zip_code: '97590-000',
+            street_name: input.address.street,
+            street_number: input.address.complement ? 
+              input.address.number.concat(', ').concat(input.address.complement) :
+              input.address.number
+          },
+          date_created: JSON.stringify(orderResponse.createdAt)
+        },
+        back_urls: {
+          success: `${process.env.NEXT_PUBLIC_BASE_URL}/${input.slug}/orders?phone=${removePoints(input.customerPhone)}&clean=true`,
+          failure: `${process.env.NEXT_PUBLIC_BASE_URL}/${input.slug}/checkout?status=failure`,
+          pending: `${process.env.NEXT_PUBLIC_BASE_URL}/${input.slug}/checkout?status=pending&phone=${removePoints(input.customerPhone)}&clean=true`, 
+        },
+        auto_return: "approved",
+        notification_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/mercadopago-webhooks`,
+        external_reference: JSON.stringify(orderResponse.id)
+      },
+    });
+    return { redirectUrl: response.init_point };
+  }
 };

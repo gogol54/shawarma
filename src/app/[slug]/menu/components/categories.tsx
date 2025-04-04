@@ -25,7 +25,7 @@ interface RestaurantCategoriesProps {
 }
 
 const RestaurantCategories = ({ restaurant }: RestaurantCategoriesProps) => {
-  const { products, total, totalQuantity, toggleCart } = useContext(CartContext);
+  const { products, total, totalQuantity, setIsOpen } = useContext(CartContext);
 
   // Agora selecionamos a categoria inteira e não apenas o nome
   const [selectedCategory, setSelectedCategory] = useState(
@@ -108,7 +108,7 @@ const RestaurantCategories = ({ restaurant }: RestaurantCategoriesProps) => {
               </span> 
             </p>
           </div>
-          <Button onClick={toggleCart}>Ver sacola</Button>
+          <Button onClick={() => setIsOpen(true)}>Ver sacola</Button>
           <CartSheet />
         </div>
       )}

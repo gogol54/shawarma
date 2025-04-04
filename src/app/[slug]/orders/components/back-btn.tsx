@@ -1,6 +1,7 @@
 'use client'
 
 import { ChevronLeftIcon } from 'lucide-react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import React, { useContext } from 'react'
 
@@ -10,11 +11,11 @@ import { CartContext } from '../../menu/contexts/cart'
 
 export const GoBackBtn = () => {
   const router = useRouter()
-  const { clearCart, toggleCart } = useContext(CartContext)
+  const { clearCart, setIsOpen } = useContext(CartContext)
 
   const handleBack = () => {
-    toggleCart()
     clearCart()
+    setIsOpen(false)
     router.push('/rosul')
   }
 
@@ -39,8 +40,14 @@ export const TrackOrderButton = ({ orderId }: TrackOrderButtonProps) => {
   }
 
   return (
-    <Button onClick={handleClick} className="w-full justify-between">
-      Acompanhe seu pedido
+    <Button onClick={handleClick} className="w-full justify-between text-slate-200 bg-neutral-600 hover:bg-neutral-700">
+      Acompanhe seu pedido 
+      <Image 
+        src="/wpp.png"
+        alt="whatsapp logo"
+        width={30}
+        height={30}
+      />
     </Button>
   )
 }

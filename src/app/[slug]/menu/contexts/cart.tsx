@@ -13,12 +13,14 @@ export interface ICartContext {
   products: CartProduct[];
   total: number;
   totalQuantity: number;
-  toggleCart: () => void;
+  payOnDelivery: boolean; 
   clearCart: () => void;
+  setIsOpen: (value: boolean) => void;
+  setPayOnDelivery: (value: boolean) => void;
   addProduct: (Product: CartProduct) => void;
-  decreaseProductQuantity: (productId: string) => void;
-  increaseProductQuantity: (ProductId: string) => void;
-  removeProduct: (productId: string) => void;
+  decreaseProductQuantity: (productId: string, dropIng: string[]) => void;
+  increaseProductQuantity: (productId: string, dropIng: string[]) => void;
+  removeProduct: (productId: string, dropIng: string[]) => void;
 }
 
 export const CartContext = createContext<ICartContext>({
@@ -26,7 +28,9 @@ export const CartContext = createContext<ICartContext>({
   products: [],
   total: 0,
   totalQuantity: 0,
-  toggleCart: () => {},
+  payOnDelivery: false, 
+  setIsOpen: () => {},
+  setPayOnDelivery: () => {},
   addProduct: () => {},
   decreaseProductQuantity: () => {},
   increaseProductQuantity: () => {},
@@ -37,6 +41,8 @@ export const CartContext = createContext<ICartContext>({
 export const CartProvider = ({children} : {children: ReactNode}) => {
   const [products, setProducts] = useState<CartProduct[]>([])
   const [isOpen, setIsOpen]= useState<boolean>(false)
+  const [payOnDelivery, setPayOnDelivery] = useState<boolean>(false);
+
   const total = products.reduce((acc, product) => {
     return acc + product.price * product.quantity;
   },0)
@@ -70,20 +76,22 @@ export const CartProvider = ({children} : {children: ReactNode}) => {
       })
     );
   };
-  
-  const toggleCart = () => {
-    setIsOpen((prev) => !prev)
-  }
 
-  const removeProduct = (productId: string) => {
-    setProducts(prevs => prevs.filter(item => item.id !== productId))
-  } 
-
+  const removeProduct = (productId: string, dropIng: string[]) => {
+    setProducts((prevs) =>
+      prevs.filter((item) => {
+        const isSameId = item.id === productId;
+        const isSameDropIng = JSON.stringify(item.dropIng) === JSON.stringify(dropIng);
+        return !(isSameId && isSameDropIng); // mantém todos os outros
+      })
+    );
+  };
   const clearCart = () => {
     setProducts([]);
   };
 
   const addProduct = (product: CartProduct) => {
+    product.dropIng.sort()
     setProducts((prevProducts) => {
       const existingProduct = prevProducts.find(
         (item) => item.id === product.id && JSON.stringify(item.dropIng) === JSON.stringify(product.dropIng)
@@ -111,7 +119,9 @@ export const CartProvider = ({children} : {children: ReactNode}) => {
         products,
         total,
         totalQuantity,
-        toggleCart,
+        payOnDelivery,
+        setPayOnDelivery,
+        setIsOpen,
         addProduct,
         decreaseProductQuantity,
         increaseProductQuantity,

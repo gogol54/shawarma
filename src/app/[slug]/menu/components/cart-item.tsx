@@ -36,22 +36,30 @@ const CartItem = ({item} : CartItemProps) => {
           <p className="text-sm font-semibold">{formatCurrency(item.price)}</p>
           {/* QUANTIDADE */}
           <div className="flex items-center gap-1 text-center">
-            <Button className="h-7 w-7 rounded-lg" variant="outline" onClick={() => decreaseProductQuantity(item.id, item.dropIng)}>
-              <ChevronLeftIcon 
-                size={12}
-              />
+            <Button 
+              className="h-7 w-7 rounded-lg" 
+              variant="outline" 
+              onClick={() => decreaseProductQuantity(item.id, item.dropIng)}
+            >
+              <ChevronLeftIcon size={12}/>
             </Button>      
               <p className="w-7 text-xs">{item.quantity}</p>
-            <Button className="h-7 w-7 rounded-lg" variant="destructive" onClick={() => increaseProductQuantity(item.id, item.dropIng)}>
-              <ChevronRightIcon
-                size={12} 
-              />
+            <Button 
+              className="h-7 w-7 rounded-lg" 
+              variant="destructive"
+              onClick={() => increaseProductQuantity(item.id, item.dropIng)}
+            >
+              <ChevronRightIcon size={12}/>
             </Button>        
           </div>
         </div>
       </div>
       <div>
-        <Button className="w-7 h-7 rounded-lg" variant="outline" onClick={() => removeProduct(item.id)}>
+        <Button 
+          className="w-7 h-7 rounded-lg" 
+          variant="outline" 
+          onClick={() => removeProduct(item.id, item.dropIng)}
+        >
           <TrashIcon />
         </Button>
       </div>
