@@ -166,12 +166,12 @@ export const createOrder = async (input: CreateOrderInput) => {
         pending: `${process.env.NEXT_PUBLIC_BASE_URL}/${input.slug}/checkout?status=pending&phone=${removePoints(input.customerPhone)}&clean=true`, 
       },
       auto_return: "approved",
-      notification_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/mercadopago-webhoock`,
+      notification_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/mercadopago-webhooks`,
       external_reference: JSON.stringify(orderResponse.id)
     },
   });
 
-  console.log("Preferência criada com sucesso:", response);
 
+  
   return { redirectUrl: response.init_point };
 };

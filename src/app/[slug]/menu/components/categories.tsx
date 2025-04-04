@@ -63,7 +63,7 @@ const RestaurantCategories = ({ restaurant }: RestaurantCategoriesProps) => {
           {open ? (
             <div className="flex items-center gap-1 text-green-500">
               <ClockIcon size={12} />
-              <p className="font-semibold text-lg">Aberto até às 23:59!</p>
+              <p className="font-semibold text-sm">Aberto até às 23:59!</p>
             </div>
           ) : (
             <div className="flex items-center gap-1 text-red-500">
