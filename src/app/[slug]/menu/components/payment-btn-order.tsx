@@ -16,7 +16,6 @@ import {
   DrawerClose,
   DrawerContent,
   DrawerDescription,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
@@ -34,10 +33,9 @@ import { createOrder } from "../actions/create-order";
 import { CartContext } from "../contexts/cart";
 import { validateCPF } from "../helpers/cpf";
 
-// Definição do Schema
 const formSchema = z.object({
   name: z.string().trim().min(1, { message: "O nome é obrigatório." }),
-  cpf: z.string().trim().min(1, { message: "O CPF é obrigatório." }).refine((value) => validateCPF(value), { message: "CPF inválido!" }),
+  cpf: z.string().trim().min(1, { message: "O CPF é obrigatório." }).refine(validateCPF, { message: "CPF inválido!" }),
   phone: z.string().trim().min(1, { message: "O contato é obrigatório." }),
   address: z.object({
     street: z.string().trim().min(1, { message: "A rua é obrigatória." }),
@@ -47,23 +45,21 @@ const formSchema = z.object({
   })
 });
 
-type FormSchema = z.infer<typeof formSchema>
+type FormSchema = z.infer<typeof formSchema>;
 
-interface FinishOrderDialogProps{
-  open: boolean,
-  onOpenChange: (open: boolean) => void,
-  
+interface FinishOrderDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-
-const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
+const FinishDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
   const search = useSearchParams();
   const { products, clearCart, setIsOpen, payOnDelivery } = useContext(CartContext);
   const [isPending, startTransition] = useTransition();
   const { slug } = useParams();
   const safeSlug = Array.isArray(slug) ? slug[0] : slug ?? "";
 
-  const form = useForm({
+  const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
@@ -74,11 +70,11 @@ const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
     shouldUnregister: true,
   });
 
-  const onSubmit = async (data: FormSchema) => {
-    setIsOpen(false);
-    try {
-      startTransition(async () => {
+  const onSubmit = (data: FormSchema) => {
+    startTransition(async () => {
+      try {
         const consumptionMethod = search.get("consumptionMethod") as ConsumptionMethod;
+
         const response = await createOrder({
           consumptionMethod,
           customerCpf: data.cpf,
@@ -89,35 +85,39 @@ const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
             number: data.address.number || "",
             complement: data.address.complement || "",
             zone: data.address.zone || "",
-          },    
+          },
           products,
           slug: safeSlug,
           control: payOnDelivery
         });
-        clearCart();
-        onOpenChange(false);
-        toast.success("Agradecemos pela preferência!");
-        if (response.redirectUrl) {
-          window.location.href = response.redirectUrl; // 🔹 Redireciona para o Mercado Pago
+
+        if (response?.redirectUrl) {
+          clearCart();
+          setIsOpen(false);
+          onOpenChange(false);
+          toast.success("Agradecemos pela preferência!");
+          window.location.href = response.redirectUrl;
         } else {
           toast.error("Erro ao redirecionar para o pagamento.");
         }
-      });
-    } catch (error) {
-      toast.error("Algum erro foi encontrado, tente novamente!");
-      console.log(error);
-    }
+      } catch (error) {
+        toast.error("Algum erro foi encontrado, tente novamente!");
+        console.log(error);
+      }
+    });
   };
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="flex-column bg-white p-2 shadow-lg rounded-lg w-full overflow-y-scroll">
+      <DrawerContent className="bg-white shadow-lg rounded-t-lg w-full h-[90dvh] flex flex-col">
         <DrawerHeader>
-            <DrawerTitle>Finalizar Pedido</DrawerTitle>
-            <DrawerDescription>Insira suas informações para finalizar o pedido</DrawerDescription>
+          <DrawerTitle>Finalizar Pedido</DrawerTitle>
+          <DrawerDescription>Insira suas informações para finalizar o pedido</DrawerDescription>
         </DrawerHeader>
+
+        <div className="flex-1 overflow-y-auto px-4 space-y-4 scroll-pb-40">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} >
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField name="name" control={form.control} render={({ field }) => (
                 <FormItem>
                   <FormLabel>Nome</FormLabel>
@@ -154,29 +154,31 @@ const FinishDialog = ({open, onOpenChange}: FinishOrderDialogProps) => {
                 </FormItem>
               )} />
               <FormField name="address.complement" control={form.control} render={({ field }) => (
-                <FormItem >
-                  <FormLabel >Complemento</FormLabel>
+                <FormItem>
+                  <FormLabel>Complemento</FormLabel>
                   <FormControl><Input placeholder="Complemento (opcional)..." {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
-              <FormField  name="address.zone" control={form.control} render={({ field }) => (
-                <FormItem >
+              <FormField name="address.zone" control={form.control} render={({ field }) => (
+                <FormItem>
                   <FormLabel>Bairro</FormLabel>
                   <FormControl><Input placeholder="Bairro..." {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
-              <DrawerFooter className="mt-auto">
-                <Button type="submit" color='green' disabled={isPending}>
-                  {isPending && <Loader2Icon className="animate-spin" />} Efetuar Compra
+
+              <div className="pb-6 pt-2 space-y-2">
+                <Button type="submit" className="w-full" disabled={isPending}>
+                  {isPending && <Loader2Icon className="animate-spin mr-2 h-4 w-4" />} Efetuar Compra
                 </Button>
                 <DrawerClose asChild>
-                  <Button variant="destructive">Cancelar</Button>
+                  <Button variant="destructive" className="w-full" disabled={isPending}>Cancelar</Button>
                 </DrawerClose>
-              </DrawerFooter>
+              </div>
             </form>
           </Form>
+        </div>
       </DrawerContent>
     </Drawer>
   );

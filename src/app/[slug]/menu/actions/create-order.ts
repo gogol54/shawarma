@@ -36,7 +36,6 @@ interface CreateOrderInput {
 }
 
 export const createOrder = async (input: CreateOrderInput) => {
-  console.log('Iniciando a criação do pedido...', input);
   const restaurant = await db.restaurant.findUnique({
     where: {
       slug: input.slug,
@@ -101,8 +100,27 @@ export const createOrder = async (input: CreateOrderInput) => {
     },
   });
 
-  if(orderResponse)
-    console.log('Pedido criado com sucesso. Atualizando estoque...', orderResponse);
+  if (orderResponse) {
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/checkout-mail`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: orderResponse.customerName,
+          orderId: orderResponse.id,
+          total: orderResponse.total,
+          products: orderProductsValues, 
+          control: input.control,
+          consumptionMethod: input.consumptionMethod,
+        }),
+      });
+      console.log("📨 E-mail de confirmação enviado.");
+    } catch (error) {
+      console.error("❌ Erro ao enviar e-mail:", error);
+    }
+  }
 
   // Atualizar o estoque de cada produto
   for (const item of input.products) {
