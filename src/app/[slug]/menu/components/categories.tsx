@@ -3,6 +3,7 @@
 import { Prisma } from "@prisma/client";
 import { ClockIcon, LockIcon } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useContext, useState } from "react";
 
 import { formatCurrency } from "@/app/helpers/format-currency";
@@ -59,16 +60,34 @@ const RestaurantCategories = ({ restaurant }: RestaurantCategoriesProps) => {
             <p className="text-xs opacity-55">{restaurant.description}</p>
           </div>
         </div>
-        <div className="flex items-center gap-1 text-xs mt-3">
+        <div className="flex flex-row text-xs mt-3">
           {open ? (
-            <div className="flex items-center gap-1 text-green-500">
-              <ClockIcon size={12} />
-              <p className="font-semibold text-sm">Aberto até às 23:59!</p>
+            <div className="flex flex-row gap-24 space-between ">
+              <div className="flex flex-row">
+                <ClockIcon size={12} className="mt-1 text-green-500 "/>
+                <p className="font-semibold text-green-500 text-sm">Aberto até às 23:59!</p>
+              </div>
+              <div>
+                <p>
+                  <Link rel="stylesheet" href={`/${restaurant.slug}/orders`} className="text-blue-500">
+                    Meus pedidos
+                  </Link>
+                </p>
+              </div>
             </div>
           ) : (
-            <div className="flex items-center gap-1 text-red-500">
-              <LockIcon size={12} />
-              <p>Fechado</p>
+             <div className="flex flex-row gap-24 space-between ">
+              <div className="flex flex-row">
+                <LockIcon size={12} className="mt-1 text-red-500 "/>
+                <p className="font-semibold text-red-500 text-sm">Fechado</p>
+              </div>
+              <div>
+                <p>
+                  <Link rel="stylesheet" href={`/${restaurant.slug}/orders`} className="text-blue-500">
+                    Meus pedidos
+                  </Link>
+                </p>
+              </div>
             </div>
           )}
         </div>

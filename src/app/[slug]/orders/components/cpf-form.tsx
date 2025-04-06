@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { PatternFormat } from 'react-number-format'
 import z from 'zod'
-import { useState } from 'react'
+
 import { Button } from '@/components/ui/button'
 import {
   Drawer,
@@ -25,6 +25,7 @@ import {
   FormMessage,
  } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+
 import { removePoints } from '../../menu/helpers/cpf'
 
 const formSchema = z.object({   

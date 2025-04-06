@@ -5,8 +5,6 @@ import { ChevronLeftIcon, ScrollTextIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-// import { useState } from "react";
-// import CpfForm from "@/app/[slug]/orders/components/cpf-form";
 import { Button } from "@/components/ui/button";
 
 

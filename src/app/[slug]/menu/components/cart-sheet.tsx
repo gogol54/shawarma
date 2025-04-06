@@ -33,7 +33,7 @@ const CartSheet = () => {
   console.log(products)
   return (
     <Sheet open={isOpen} onOpenChange={() => setIsOpen(!isOpen)}>
-      <SheetContent className="w-[90%] max-w-[450px] mx-auto">
+      <SheetContent className="w-[85%] max-w-[450px] mx-auto">
         <SheetHeader>
           <SheetTitle>Suas Compras</SheetTitle>
         </SheetHeader>
