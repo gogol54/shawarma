@@ -21,21 +21,23 @@ const ConsumptionMethodOption = ({
   slug 
 } : ConsumptionMethodOptionProp ) => {
   return ( 
-    <Card>
-      <CardContent className="flex flex-col items-center gap-8 py-8">
-        <div className="relative h-[80px] w-[80px]">
-          <Image
-            src={imageUrl}
-            fill
-            className="object-contain"
-            alt={imageAlt}
-          />
-        </div>
-        <Button variant="secondary" className="rounded-full" asChild>
-          <Link href={`${slug}/menu?consumptionMethod=${option}`}>{buttonText}</Link>
-        </Button>
-      </CardContent>
-    </Card>
+    <Link href={`${slug}/menu?consumptionMethod=${option}`}>
+      <Card>
+        <CardContent className="flex flex-col items-center gap-8 py-8">
+          <div className="relative h-[80px] w-[80px]">
+            <Image
+              src={imageUrl}
+              fill
+              className="object-contain"
+              alt={imageAlt}
+            />
+          </div>
+          <Button variant="secondary" className="rounded-full" >
+            {buttonText}
+          </Button>
+        </CardContent>
+      </Card>
+    </Link>
    )
 }
  

@@ -14,18 +14,18 @@ const RestaurantsPage = async ({ params }: RestaurantsPageProps) => {
     return notFound()
   }
   return (
-    <div className="flex flex-col items-center justify-center-px-6 pt-24">
+    <div className="flex flex-col items-center justify-center-px-6 pt-12">
       <div className="flex flex-col items-center gap-2">
           <Image 
             src={restaurant?.avatarImageUrl}
             alt={restaurant?.name}
-            width={82}
-            height={82}
+            width={140}
+            height={140}
           />
-          <h2 className="font-semibold">{restaurant.name}</h2>
+          <h2 className="font-semibold text-2xl">{restaurant.name}</h2>
       </div>
-      <div className="pt-24 text-center space-y-2">
-        <h3 className="text-2xl font-semibold">
+      <div className="pt-12 text-center space-y-2">
+        <h3 className="text-xl font-semibold">
           Seja Bem-vindo!
         </h3>
         <p className="opacity-55">

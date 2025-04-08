@@ -21,12 +21,22 @@ const RestaurantMenuPage = async ({params, searchParams}: RestaurantMenuProps) =
     where: {slug},
     include: {
       menuCategories: {
+     
         include: {
           products: true
         },
       },
     }
   })
+  const randomData = restaurant?.menuCategories
+  const ordem = ['salgados','doces','combos', 'fritas', 'bebidas' ]; // você pode incluir mais categorias aqui
+  randomData?.sort((a, b) => {
+    const indexA = ordem.indexOf(a.name.toLowerCase());
+    const indexB = ordem.indexOf(b.name.toLowerCase());
+  
+    // categorias que não estão na lista ficam no final
+    return (indexA === -1 ? ordem.length : indexA) - (indexB === -1 ? ordem.length : indexB);
+  });
   
   if(!restaurant || !isConsumptionMethodValid(consumptionMethod)){
     return notFound()

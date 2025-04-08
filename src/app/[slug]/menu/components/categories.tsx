@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useContext, useState } from "react";
 
 import { formatCurrency } from "@/app/helpers/format-currency";
-import { isOpen } from "@/app/helpers/is-open";
+import { isOpenRestaurant } from "@/app/helpers/is-open";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
@@ -37,7 +37,7 @@ const RestaurantCategories = ({ restaurant }: RestaurantCategoriesProps) => {
     setSelectedCategory(category);
   }
 
-  const open = isOpen();
+  const open = isOpenRestaurant();
 
   const getCategoryBtn = (category: string) => {
     return selectedCategory?.name === category ? "default" : "secondary";
@@ -60,35 +60,43 @@ const RestaurantCategories = ({ restaurant }: RestaurantCategoriesProps) => {
             <p className="text-xs opacity-55">{restaurant.description}</p>
           </div>
         </div>
-        <div className="flex flex-row text-xs mt-3">
+        <div className="flex flex-row justify-between text-xs mt-3 items-center">
           {open ? (
-            <div className="flex flex-row gap-24 space-between ">
-              <div className="flex flex-row">
-                <ClockIcon size={12} className="mt-1 text-green-500 "/>
-                <p className="font-semibold text-green-500 text-sm">Aberto até às 23:59!</p>
+            <>
+              <div className="flex flex-row items-center">
+                <ClockIcon size={12} className="mt-1 mr-1 text-green-500" />
+                <p className="font-semibold text-green-500 mt-1 text-[14px]">Aberto até às 23:59!</p>
               </div>
               <div>
                 <p>
-                  <Link rel="stylesheet" href={`/${restaurant.slug}/orders`} className="text-blue-500">
+                  <Link
+                    rel="stylesheet"
+                    href={`/${restaurant.slug}/orders`}
+                    className="text-blue-500 text-[14px] underline"
+                  >
                     Meus pedidos
                   </Link>
                 </p>
               </div>
-            </div>
+            </>
           ) : (
-             <div className="flex flex-row gap-24 space-between ">
-              <div className="flex flex-row">
-                <LockIcon size={12} className="mt-1 text-red-500 "/>
-                <p className="font-semibold text-red-500 text-sm">Fechado</p>
+            <>
+              <div className="flex flex-row items-center">
+                <LockIcon size={12} className="mt-1 mr-1 text-red-500" />
+                <p className="font-semibold text-red-500 mt-1 text-[14px]">Fechado</p>
               </div>
               <div>
                 <p>
-                  <Link rel="stylesheet" href={`/${restaurant.slug}/orders`} className="text-blue-500">
+                  <Link
+                    rel="stylesheet"
+                    href={`/${restaurant.slug}/orders`}
+                    className="text-blue-500 text-[14px] underline"
+                  >
                     Meus pedidos
                   </Link>
                 </p>
               </div>
-            </div>
+            </>
           )}
         </div>
       </div>

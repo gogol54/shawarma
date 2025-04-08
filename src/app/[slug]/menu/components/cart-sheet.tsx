@@ -2,8 +2,10 @@
 
 import { useSearchParams } from "next/navigation";
 import { useContext, useState } from "react";
+import { toast } from "sonner";
 
 import { formatCurrency } from "@/app/helpers/format-currency";
+import { getNextOpening,isOpenRestaurantMerged } from "@/app/helpers/is-open";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox"
@@ -72,7 +74,17 @@ const CartSheet = () => {
             </label>
           </div>
           {/* Button agora tem o evento onClick direto */}
-          <Button className="w-full rounded-full" onClick={() => setFinishOrderDialogIsOpen(true)}>
+          <Button
+            className="w-full rounded-full"
+            onClick={() => {
+              if (isOpenRestaurantMerged()) {
+                setFinishOrderDialogIsOpen(true);
+              } else {
+                const nextOpening = getNextOpening();
+                toast.error(`A loja está fechada! Abrirá novamente ${nextOpening}.`);
+              }
+            }}
+          >
             Finalizar Pedido
           </Button>
           <FinishDialog open={finishOrderDialogIsOpen} onOpenChange={setFinishOrderDialogIsOpen}/>
