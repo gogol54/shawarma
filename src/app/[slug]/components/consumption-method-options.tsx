@@ -21,7 +21,11 @@ const ConsumptionMethodOption = ({
   slug 
 } : ConsumptionMethodOptionProp ) => {
   return ( 
+<<<<<<< HEAD
     <Link href={`${slug}/menu?consumptionMethod=${option}`}>
+=======
+    <Link href={`${slug}/menu?consumptionMethod=${option}`} >
+>>>>>>> bb2a0c2caf9128a80f1daf729ffafd1e9da9f2d9
       <Card>
         <CardContent className="flex flex-col items-center gap-8 py-8">
           <div className="relative h-[80px] w-[80px]">
