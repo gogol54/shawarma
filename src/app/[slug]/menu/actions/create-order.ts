@@ -70,6 +70,7 @@ export const createOrder = async (input: CreateOrderInput) => {
   // Mapear os produtos para a tabela de pedidos
   const orderProductsValues = input.products.map((item) => ({
     productId: item.id,
+    name: item.name,
     quantity: item.quantity,
     dropIng: item.dropIng,
     price: productsWithPrices.find((p) => p.id === item.id)!.price,
