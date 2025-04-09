@@ -33,9 +33,9 @@ export default function RootLayout({
       </head>
       <body className={`${poppins.className} antialiased`}>
         <Script src="https://sdk.mercadopago.com/js/v2" strategy="beforeInteractive" />
-        <CartProvider>
-          {children}
-        </CartProvider>
+          <CartProvider>
+            {children}
+          </CartProvider>
         <Toaster />
 
       </body>

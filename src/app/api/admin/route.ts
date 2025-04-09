@@ -7,16 +7,7 @@ import nodemailer from 'nodemailer';
 dotenv.config()
 export async function POST(request: Request): Promise<NextResponse> {
   const { email, password } = await request.json();
-
-  console.log("Email do env:", process.env.ADMIN_EMAIL);
-  console.log("Hash do env:", process.env.ADMIN_PASSWORD_HASH);
-  console.log("Email recebido:", email);
-  console.log("Senha recebida:", password);
-
-  // Apenas pra testar se a senha 'pipokadoce123' bate com o hash do .env
   const isMatch = await bcrypt.compare(password, process.env.ADMIN_PASSWORD_HASH!);
-
-  console.log("Senha confere?", isMatch);
   try{
 
   if (
@@ -29,7 +20,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     const token = jwt.sign(
       { email },
       process.env.JWT_SECRET!,
-      { expiresIn: '15m' }
+      { expiresIn: '2d' }
     );
     const link = `${process.env.NEXT_PUBLIC_BASE_URL}/admin/painel?token=${token}`;
 
