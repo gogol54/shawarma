@@ -37,13 +37,13 @@ const RestaurantsPage = async ({ params }: RestaurantsPageProps) => {
         <ConsumptionMethodOption 
           slug={slug}
           buttonText="Retirar no local"
-          option="dine_in"
+          option="retirada"
           imageAlt="Retirar no local"
           imageUrl="/dine_in.png"
         />
         <ConsumptionMethodOption
           slug={slug}
-          option="takeaway" 
+          option="entrega" 
           buttonText="Entrega 🛵"
           imageAlt="Tele entrega"
           imageUrl="/takeaway.png"

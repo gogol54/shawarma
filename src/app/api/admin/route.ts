@@ -22,7 +22,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       process.env.JWT_SECRET!,
       { expiresIn: '2d' }
     );
-    const link = `${process.env.NEXT_PUBLIC_BASE_URL}/admin/painel?token=${token}`;
+    const link = `${process.env.NEXT_PUBLIC_BASE_URL}/admin/painel/${token}`;
 
     // Configura o nodemailer
     const transporter = nodemailer.createTransport({

@@ -5,7 +5,7 @@ import { useContext, useState } from "react";
 import { toast } from "sonner";
 
 import { formatCurrency } from "@/app/helpers/format-currency";
-import { getNextOpening,isOpenRestaurantMerged } from "@/app/helpers/is-open";
+import { isOpenRestaurantMerged } from "@/app/helpers/is-open";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox"
@@ -48,17 +48,17 @@ const CartSheet = () => {
           </div>
           <Card className="mb-6">
             <CardContent className="p-5">
-            {consumptionMethod === 'takeaway' && <div className="flex justify-between">
+            {consumptionMethod === 'entrega' && <div className="flex justify-between">
                 <p className="text-sm text-muted-foreground">Valor </p>
                 <p className="font-semibold text-sm">{formatCurrency(total)}</p>
               </div>}
-              {consumptionMethod === 'takeaway' && <div className="flex justify-between">
+              {consumptionMethod === 'entrega' && <div className="flex justify-between">
                 <p className="text-sm text-muted-foreground">Entrega </p>
                 <p className="font-semibold text-sm">{formatCurrency(8)}</p>
               </div>}
               <div className="flex justify-between">
                 <p className="text-sm text-muted-foreground">Total </p>
-                <p className="font-semibold text-sm">{consumptionMethod === 'takeaway' ? formatCurrency(total + 8) : formatCurrency(total)}</p>
+                <p className="font-semibold text-sm">{consumptionMethod === 'entrega' ? formatCurrency(total + 8) : formatCurrency(total)}</p>
               </div>
             </CardContent>
           </Card>
@@ -80,8 +80,7 @@ const CartSheet = () => {
               if (isOpenRestaurantMerged()) {
                 setFinishOrderDialogIsOpen(true);
               } else {
-                const nextOpening = getNextOpening();
-                toast.error(`A loja está fechada! Abrirá novamente ${nextOpening}.`);
+                toast.error("Estamos fechado neste momento! Atendemos de quinta à domingo 19:30 até 11:59...");
               }
             }}
           >

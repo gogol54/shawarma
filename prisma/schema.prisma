@@ -79,8 +79,8 @@ enum OrderStatus {
 }
 
 enum ConsumptionMethod {
-  takeaway
-  dine_in
+  entrega
+  retirada
 }
 
 model OrderProduct {

@@ -74,7 +74,6 @@ const FinishDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
     startTransition(async () => {
       try {
         const consumptionMethod = search.get("consumptionMethod") as ConsumptionMethod;
-
         const response = await createOrder({
           consumptionMethod,
           customerCpf: data.cpf,

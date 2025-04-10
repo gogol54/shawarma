@@ -53,7 +53,7 @@ export async function POST(req: Request) {
       </table>
 
       <p style="margin-top: 20px;"><strong>Total:</strong> R$ ${total.toFixed(2)}</p>
-      <p style="margin-top: 10px;"> Metodo de entrega: ${consumptionMethod === 'dine_in' ? ' retirada no local' : ' entrega/delivery.'} </p>
+      <p style="margin-top: 10px;"> Metodo de entrega: ${consumptionMethod === 'retirada' ? ' retirada no local' : ' entrega/delivery.'} </p>
       <p style="margin-top: 10px;"> Método de Pagamento ${control === true ? ' na retirada.' : ' via mercado pago.'} </p>
     </div>
   `;

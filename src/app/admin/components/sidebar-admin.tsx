@@ -3,7 +3,6 @@ import {
   Home, 
   Pencil, 
   Plus,
-  Search 
 } from "lucide-react"
 
 import {
@@ -16,56 +15,49 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,  
 } from "../../../components/ui/sidebar"
-// Menu items.
-const group_01 = [
-  {
-    title: "Dashboard",
-    url: "#",
-    icon: Home,
-  },
- 
-]
-const group_02 = [
-  {
-    title: "Listar",
-    url: "#",
-    icon: FileArchive,
-  },
-  {
-    title: "Cadastrar",
-    url: "#",
-    icon: Plus,
-  },
 
-  {
-    title: "Atualizar ou Remover",
-    url: "#",
-    icon: Pencil,
-  },
-]
-const group_03 = [
-  {
-    title: "Listar",
-    url: "#",
-    icon: FileArchive,
-  },
-  {
-    title: "Buscar",
-    url: "#",
-    icon: Search,
-  },
-  {
-    title: "Atualizar",
-    url: "#", 
-    icon: Pencil,
-  },
-]
+const getPanelRoute = (token: string, route?: string) =>
+  `/admin/painel/${token}${route ? `?route=${route}` : ''}`
 
-export function AppSidebar() {
+export function AppSidebar({ token }: { token: string }) {
+  const group_01 = [
+    {
+      title: "Dashboard",
+      url: getPanelRoute(token, 'dashboard'),
+      icon: Home,
+    },
+  ];
+
+  const group_02 = [
+    {
+      title: "Listar",
+      url: getPanelRoute(token, 'produtos'),
+      icon: FileArchive,
+    },
+    {
+      title: "Cadastrar",
+      url: getPanelRoute(token, 'cadastrar'),
+      icon: Plus,
+    },
+    {
+      title: "Atualizar ou Remover",
+      url: getPanelRoute(token, 'alterar'),
+      icon: Pencil,
+    },
+  ];
+
+  const group_03 = [
+    {
+      title: "Listar",
+      url: getPanelRoute(token, 'pedidos'),
+      icon: FileArchive,
+    }
+  ];
+
   return (
     <Sidebar>
       <SidebarContent>
-      <SidebarGroup>
+        <SidebarGroup>
           <SidebarGroupLabel>Aplicação</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>

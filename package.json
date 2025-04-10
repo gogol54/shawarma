@@ -40,6 +40,7 @@
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",
     "react-number-format": "^5.4.3",
+    "recharts": "^2.15.2",
     "shawarma-rosul": "file:",
     "sonner": "^2.0.1",
     "tailwind-merge": "^3.0.1",

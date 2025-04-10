@@ -12,7 +12,7 @@ interface RestaurantMenuProps {
 }
 
 const isConsumptionMethodValid = (ConsumptionMethod: string) => {
-  return ["dine_in", "takeaway"].includes(ConsumptionMethod)
+  return ["retirada", "entrega"].includes(ConsumptionMethod)
 }
 const RestaurantMenuPage = async ({params, searchParams}: RestaurantMenuProps) => {
   const { slug } = await params

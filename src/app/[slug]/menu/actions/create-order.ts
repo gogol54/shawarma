@@ -70,12 +70,18 @@ export const createOrder = async (input: CreateOrderInput) => {
   // Mapear os produtos para a tabela de pedidos
   const orderProductsValues = input.products.map((item) => ({
     productId: item.id,
-    name: item.name,
     quantity: item.quantity,
     dropIng: item.dropIng,
     price: productsWithPrices.find((p) => p.id === item.id)!.price,
   }));
 
+  const orderProductsValuesToMail = input.products.map((item) => ({
+    productId: item.id,
+    name: item.name,
+    quantity: item.quantity,
+    dropIng: item.dropIng,
+    price: productsWithPrices.find((p) => p.id === item.id)!.price,
+  }));
   // Criar o pedido no banco de dados
   const orderResponse = await db.order.create({
     data: {
@@ -90,7 +96,7 @@ export const createOrder = async (input: CreateOrderInput) => {
           data: orderProductsValues,
         },
       },
-      total: input.consumptionMethod === 'takeaway' ? orderProductsValues.reduce(
+      total: input.consumptionMethod === 'entrega' ? orderProductsValues.reduce(
         (acc, item) => acc + item.price * item.quantity,
         0
       ) + 8 : orderProductsValues.reduce(
@@ -112,7 +118,7 @@ export const createOrder = async (input: CreateOrderInput) => {
           name: orderResponse.customerName,
           orderId: orderResponse.id,
           total: orderResponse.total,
-          products: orderProductsValues, 
+          products: orderProductsValuesToMail, 
           control: input.control,
           consumptionMethod: input.consumptionMethod,
         }),
@@ -154,7 +160,7 @@ export const createOrder = async (input: CreateOrderInput) => {
               unit_price: product.price,
             };
           }),
-          ...(input.consumptionMethod === "takeaway"
+          ...(input.consumptionMethod === "entrega"
             ? [
                 {
                   id: "frete",
