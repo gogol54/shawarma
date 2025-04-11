@@ -7,18 +7,42 @@ import Topbar from "../components/topbar"
 
 export default async function OrdersList() {
   const orders = await db.order.findMany({
-    include: {
+    select: {
+      id: true,
+      total: true,
+      status: true,
+      consumptionMethod: true,
+      customerName: true,
+      customerPhone: true,
+      createdAt: true,
       orderProducts: {
-        include: {
-          product: true // <-- Isso traz o nome, descrição, etc
-        }
-      }
-    }
+        select: {
+          id: true,
+          productId: true,
+          quantity: true,
+          price: true,
+          dropIng: true,
+          product: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
   })
+  const ordersArray = orders.map(order => ({
+    ...order,
+    createdAt: order.createdAt.toISOString(),
+  }))
+
   return (
     <div className="w-full">
       <Topbar />
-      <OrdersListComponent orders={orders} />
+      <OrdersListComponent orders={ordersArray} />
     </div>
   )
 }

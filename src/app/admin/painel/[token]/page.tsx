@@ -1,5 +1,3 @@
-// app/admin/painel/[token]/page.tsx
-
 import { redirect } from 'next/navigation'
 
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
@@ -10,11 +8,10 @@ import DashboardPage from '../../pages/dashboard'
 import OrdersList from '../../pages/orders-list'
 import CreateProducts from '../../pages/products-create'
 import ProductsList from '../../pages/products-list'
-import ProductsUpdate from '../../pages/products-put'
 
-type Props = {
-  params: { token?: string | string[] }
-  searchParams: { route?: string }
+type PanelPageProps = {
+  params: Promise<{ token?: string | string[] }>
+  searchParams: Promise<{ route?: string }>
 }
 
 const getComponent = (route?: string) => {
@@ -23,20 +20,20 @@ const getComponent = (route?: string) => {
       return <OrdersList />
     case 'produtos':
       return <ProductsList />
-    case 'cadastrar': 
+    case 'cadastrar':
       return <CreateProducts />
-    case 'alterar':
-      return <ProductsUpdate />
     case 'dashboard':
-      return <DashboardPage />
     default:
       return <DashboardPage />
   }
 }
-export default async function PanelPage({ params, searchParams }: Props) {
-  const tokenParam = Array.isArray(params.token) ? params.token[0] : params.token
 
-  // redireciona se não tiver token
+export default async function PanelPage({ params, searchParams }: PanelPageProps) {
+  const { token } = await params
+  const { route } = await searchParams
+
+  const tokenParam = Array.isArray(token) ? token[0] : token
+
   if (!tokenParam) {
     redirect('/admin')
   }
@@ -47,7 +44,7 @@ export default async function PanelPage({ params, searchParams }: Props) {
     redirect('/admin')
   }
 
-  const Content = getComponent(searchParams.route)
+  const Content = getComponent(route)
 
   return (
     <SidebarProvider>

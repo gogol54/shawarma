@@ -1,7 +1,6 @@
 import { 
   FileArchive,
   Home, 
-  Pencil, 
   Plus,
 } from "lucide-react"
 
@@ -30,7 +29,7 @@ export function AppSidebar({ token }: { token: string }) {
 
   const group_02 = [
     {
-      title: "Listar",
+      title: "Lista de Produtos",
       url: getPanelRoute(token, 'produtos'),
       icon: FileArchive,
     },
@@ -38,17 +37,12 @@ export function AppSidebar({ token }: { token: string }) {
       title: "Cadastrar",
       url: getPanelRoute(token, 'cadastrar'),
       icon: Plus,
-    },
-    {
-      title: "Atualizar ou Remover",
-      url: getPanelRoute(token, 'alterar'),
-      icon: Pencil,
-    },
+    }
   ];
 
   const group_03 = [
     {
-      title: "Listar",
+      title: "Lista de Pedidos",
       url: getPanelRoute(token, 'pedidos'),
       icon: FileArchive,
     }

@@ -1,6 +1,7 @@
 'use client'
 
 import { ConsumptionMethod, OrderStatus } from "@prisma/client"
+import { JsonValue } from "@prisma/client/runtime/library"
 import { useState, useTransition } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -33,11 +34,11 @@ type OrdersListComponentProps = {
     customerPhone: string
     createdAt: string // ou Date, dependendo de como vem do backend
     orderProducts: {
-      id: number
-      productId: number
+      id: string
+      productId: string 
       quantity: number
       price: number
-      dropIng: JSON
+      dropIng: JsonValue | null
       product: {
         name: string
       }
