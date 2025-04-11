@@ -31,6 +31,7 @@ type OrdersListComponentProps = {
     consumptionMethod: ConsumptionMethod
     customerName: string
     customerPhone: string
+    createdAt: string // ou Date, dependendo de como vem do backend
     orderProducts: {
       id: number
       productId: number
@@ -50,6 +51,27 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
   const [viewProductsOrderId, setViewProductsOrderId] = useState<number | null>(null)
   const [newStatus, setNewStatus] = useState<OrderStatus>('PENDING')
   const [isPending, startTransition] = useTransition()
+  const motoboy : number = 8
+  const getMinutesSince = (createdAt: string | Date, status: string) => {
+    if (status !== "IN_PREPARATION" && status !== "PENDING") {
+      switch (status) {
+        case "FINISHED":
+          return "Finalizado"
+        case "CANCELLED":
+          return "Cancelado"
+        case "DELIVERY":
+          return "Finalizado"
+        default:
+          return "-"
+      }
+    }
+  
+    const created = new Date(createdAt)
+    const now = new Date()
+    const diffMs = now.getTime() - created.getTime()
+    const diffMins = Math.floor(diffMs / (1000 * 60))
+    return `${diffMins} min`
+  }
 
   const statusFormatter = (status: string) => {
     switch (status) {
@@ -96,7 +118,8 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
             <TableHead>ID</TableHead>
             <TableHead>Cliente</TableHead>
             <TableHead>Celular</TableHead>
-            <TableHead>Metodo</TableHead>
+            <TableHead>Métôdo</TableHead>
+            <TableHead>Tempo de preparo</TableHead>
             <TableHead>Total</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Ações</TableHead>
@@ -109,6 +132,9 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
               <TableCell>{order.customerName || "N/A"}</TableCell>
               <TableCell>{order.customerPhone}</TableCell>
               <TableCell>{order.consumptionMethod}</TableCell>
+              <TableCell>
+                {getMinutesSince(order.createdAt, order.status)}
+              </TableCell>
               <TableCell>R$ {order.total.toFixed(2)}</TableCell>
               <TableCell>{statusFormatter(order.status)}</TableCell>
               <TableCell className="flex gap-2">
@@ -123,7 +149,7 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
                     <DialogHeader>
                       <DialogTitle>Atualizar Status</DialogTitle>
                     </DialogHeader>
-                    <p className="text-sm">Pedido #{order.id} - {order.customerName}</p>
+                    <p className="text-sm">Pedido #{viewProductsOrderId} - {order.customerName}</p>
                     <select
                       value={newStatus}
                       onChange={(e) => setNewStatus(e.target.value as OrderStatus)}
@@ -160,15 +186,23 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
                             key={index}
                             className="border border-gray-200 p-2 rounded shadow-sm"
                           >
-                            <p className="text-sm"><strong>Produto:</strong> {product.product.name}</p>
-                            <p className="text-sm"><strong>Quantidade:</strong> {product.quantity}</p>
-                            <p className="text-sm">
+                            <p className="text-base"><strong>Produto:</strong> {product.product.name}</p>
+                            <p className="text-base"><strong>Quantidade:</strong> {product.quantity}</p>
+                            <p className="text-base"><strong>Preço:</strong> R$ {product.price.toFixed(2)}</p>
+                            {order.consumptionMethod === 'entrega' &&
+                              <p className="text-base"><strong>Entrega:</strong> R$ {motoboy.toFixed(2)}</p>
+                            }
+                            <p className="text-base"><strong>Total:</strong> R$ {
+                              order.consumptionMethod === 'entrega' ? 
+                                (product.price + motoboy).toFixed(2) : 
+                                product.price.toFixed(2)}
+                            </p>
+                            <p className="text-base">
                               <strong>Ingredientes p/ remover:</strong>{" "}
                               {Array.isArray(product.dropIng)
                                 ? product.dropIng.join(", ")
                                 : "Nenhum"}
                             </p>
-                            <p className="text-sm"><strong>Preço:</strong> R$ {product.price.toFixed(2)}</p>
                           </div>
                         ))
                       ) : (

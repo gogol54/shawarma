@@ -8,7 +8,6 @@ import { verifyToken } from '../../actions/verify-token'
 import { AppSidebar } from '../../components/sidebar-admin'
 import DashboardPage from '../../pages/dashboard'
 import OrdersList from '../../pages/orders-list'
-import OrdersUpdate from '../../pages/orders-update'
 import CreateProducts from '../../pages/products-create'
 import ProductsList from '../../pages/products-list'
 import ProductsUpdate from '../../pages/products-put'
@@ -22,8 +21,6 @@ const getComponent = (route?: string) => {
   switch (route) {
     case 'pedidos':
       return <OrdersList />
-    case 'atualizar':
-      return <OrdersUpdate />
     case 'produtos':
       return <ProductsList />
     case 'cadastrar': 
