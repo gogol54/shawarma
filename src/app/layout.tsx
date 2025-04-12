@@ -26,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <head>
         <link rel="icon" href="https://firebasestorage.googleapis.com/v0/b/facilitastorage.appspot.com/o/shawarma%2Ficon-none-resize.png?alt=media&token=4a604c9c-3d6e-4aab-b86d-384195f034e4" sizes="any" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -34,9 +34,9 @@ export default function RootLayout({
       <body className={`${poppins.className} antialiased`}>
         <Script src="https://sdk.mercadopago.com/js/v2" strategy="beforeInteractive" />
           <CartProvider>
-            <div className="max-w-screen-lg mx-auto">
+            {/* <div className="max-w-screen-lg mx-auto"> */}
               {children}
-            </div>
+            {/* </div> */}
           </CartProvider>
         <Toaster />
 

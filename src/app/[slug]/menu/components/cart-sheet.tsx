@@ -2,10 +2,10 @@
 
 import { useSearchParams } from "next/navigation";
 import { useContext, useState } from "react";
-import { toast } from "sonner";
 
+// import { toast } from "sonner";
 import { formatCurrency } from "@/app/helpers/format-currency";
-import { isOpenRestaurantMerged } from "@/app/helpers/is-open";
+// import { isOpenRestaurantMerged } from "@/app/helpers/is-open";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox"
@@ -77,11 +77,9 @@ const CartSheet = () => {
           <Button
             className="w-full rounded-full"
             onClick={() => {
-              if (isOpenRestaurantMerged()) {
+              
                 setFinishOrderDialogIsOpen(true);
-              } else {
-                toast.error("Estamos fechado neste momento! Atendemos de quinta à domingo 19:30 até 11:59...");
-              }
+         
             }}
           >
             Finalizar Pedido
