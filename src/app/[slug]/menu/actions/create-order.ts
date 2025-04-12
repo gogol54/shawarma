@@ -7,8 +7,6 @@ const mercadopago = new MercadoPagoConfig({
   accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN!,
 });
 
-import { redirect } from "next/navigation";
-
 import { db } from "@/lib/prisma";
 
 import { removePoints } from "../helpers/cpf";
@@ -142,7 +140,9 @@ export const createOrder = async (input: CreateOrderInput) => {
   }
   
   if(input.control){
-    redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/${input.slug}/orders?phone=${removePoints(input.customerPhone)}&clean=true`)
+    return {
+      redirectUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/${input.slug}/orders?phone=${removePoints(input.customerPhone)}&clean=true`
+    };
   } else { 
     const preference = new Preference(mercadopago);
     const response = await preference.create({

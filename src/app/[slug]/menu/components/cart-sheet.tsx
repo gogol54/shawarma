@@ -32,7 +32,6 @@ const CartSheet = () => {
     setPayOnDelivery 
   } = useContext(CartContext);
   const [finishOrderDialogIsOpen, setFinishOrderDialogIsOpen] = useState<boolean>(false)
-  console.log(products)
   return (
     <Sheet open={isOpen} onOpenChange={() => setIsOpen(!isOpen)}>
       <SheetContent className="w-[85%] max-w-[450px] mx-auto">
