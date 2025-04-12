@@ -51,7 +51,9 @@ export default async function PanelPage({ params, searchParams }: PanelPageProps
       <div className="flex">
         <AppSidebar token={tokenParam} />
         <SidebarTrigger />
-        <div className="w-full">{Content}</div>
+        <div className="w-full max-w-[100vw] overflow-x-auto px-2 sm:px-4 md:px-6 lg:px-10">
+          {Content}
+        </div>
       </div>
     </SidebarProvider>
   )

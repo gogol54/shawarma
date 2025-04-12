@@ -4,6 +4,7 @@ import { ConsumptionMethod, OrderStatus } from "@prisma/client"
 import { JsonValue } from "@prisma/client/runtime/library"
 import { useState, useTransition } from "react"
 
+import { formatCurrency } from "@/app/helpers/format-currency"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -111,7 +112,7 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
   }
 
   return (
-    <div className="p-4">
+    <div className="p-2 overflow-x-auto">
       <h2 className="text-2xl font-bold mb-4 text-center">Lista de Pedidos</h2>
       <Table className="w-full">
         <TableHeader>
@@ -136,17 +137,18 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
               <TableCell>
                 {getMinutesSince(order.createdAt, order.status)}
               </TableCell>
-              <TableCell>R$ {order.total.toFixed(2)}</TableCell>
+              <TableCell>{formatCurrency(order.total)}</TableCell>
               <TableCell>{statusFormatter(order.status)}</TableCell>
               <TableCell className="flex gap-2">
                 {/* Botão Editar */}
                 <Dialog open={open && activeOrderId === order.id} onOpenChange={setOpen}>
                   <DialogTrigger asChild>
-                    <Button onClick={() => handleEditClick(order.id, order.status)}>
+                    <Button onClick={() => handleEditClick(order.id, order.status)} 
+                      className="bg-blue-500 hover:bg-blue-400" >
                       Editar
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent className="max-w-full sm:max-w-lg w-[95vw] sm:w-full">
                     <DialogHeader>
                       <DialogTitle>Atualizar Status</DialogTitle>
                     </DialogHeader>
@@ -163,7 +165,7 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
                       <option value="CANCELLED">Cancelado</option>
                     </select>
                     <DialogFooter className="mt-4">
-                      <Button disabled={isPending} onClick={handleUpdate}>
+                      <Button disabled={isPending} onClick={handleUpdate} className="bg-blue-500 hover:bg-blue-400">
                         {isPending ? "Salvando..." : "Confirmar"}
                       </Button>
                     </DialogFooter>
@@ -173,12 +175,12 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
                 {/* Botão Visualizar Produtos */}
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button onClick={() => setViewProductsOrderId(order.id)}>
+                    <Button onClick={() => setViewProductsOrderId(order.id)} className="bg-blue-500 hover:bg-blue-400" >
                       Visualizar
                     </Button>
                   </DialogTrigger>
 
-                  <DialogContent>
+                  <DialogContent className="max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
                       <DialogTitle>Produtos do Pedido #{order.id}</DialogTitle>
                       {order.orderProducts.length > 0 ? (
@@ -189,14 +191,14 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
                           >
                             <p className="text-base"><strong>Produto:</strong> {product.product.name}</p>
                             <p className="text-base"><strong>Quantidade:</strong> {product.quantity}</p>
-                            <p className="text-base"><strong>Preço:</strong> R$ {product.price.toFixed(2)}</p>
+                            <p className="text-base"><strong>Preço:</strong> {formatCurrency(product.price)}</p>
                             {order.consumptionMethod === 'entrega' &&
-                              <p className="text-base"><strong>Entrega:</strong> R$ {motoboy.toFixed(2)}</p>
+                              <p className="text-base"><strong>Entrega:</strong> {formatCurrency(motoboy)}</p>
                             }
-                            <p className="text-base"><strong>Total:</strong> R$ {
+                            <p className="text-base"><strong>Total:</strong> {
                               order.consumptionMethod === 'entrega' ? 
-                                (product.price + motoboy).toFixed(2) : 
-                                product.price.toFixed(2)}
+                                formatCurrency(product.price + motoboy) : 
+                                formatCurrency(product.price)}
                             </p>
                             <p className="text-base">
                               <strong>Ingredientes p/ remover:</strong>{" "}

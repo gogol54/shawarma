@@ -10,7 +10,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger} from "@/components/ui/dialog"
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -22,7 +23,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-import { deleteProduct,updateProduct } from "../../actions/product-actions"
+import { deleteProduct, updateProduct } from "../../actions/product-actions"
 
 type Product = {
   id: string
@@ -79,154 +80,174 @@ const ProductsListComponent = ({ products }: Props) => {
 
     if (result.success) {
       setSelectedProduct(null)
+      toast.success("Produto atualizado com sucesso!")
     } else {
-      alert(result.error)
+      toast.error(result.error ?? "Erro ao atualizar produto")
     }
   }
 
   return (
-    <div className="p-4">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-4">
       <h2 className="text-2xl font-bold mb-4">Lista de Produtos</h2>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="p-2">Imagem</TableHead>
-            <TableHead className="p-2">Nome</TableHead>
-            <TableHead className="p-2">Descrição</TableHead>
-            <TableHead className="p-2">Categoria</TableHead>
-            <TableHead className="p-2">Restaurante</TableHead>
-            <TableHead className="p-2">Preço</TableHead>
-            <TableHead className="p-2">Estoque</TableHead>
-            <TableHead className="p-2">Criado em</TableHead>
-            <TableHead className="p-2">Ações</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {products.map((product) => (
-            <TableRow key={product.id}>
-              <TableCell className="p-2">
-                <Image
-                  src={product.imageUrl}
-                  alt={product.name}
-                  width={60}
-                  height={60}
-                  className="rounded object-cover"
-                />
-              </TableCell>
-              <TableCell className="p-2">{product.name}</TableCell>
-              <TableCell className="p-2 max-w-3.5 truncate">{product.description}</TableCell>
-              <TableCell className="p-2">{product.menuCategory.name}</TableCell>
-              <TableCell className="p-2">{product.restaurant.name}</TableCell>
-              <TableCell className="p-2">R$ {product.price.toFixed(2)}</TableCell>
-              <TableCell className="p-2">{product.inStock}</TableCell>
-              <TableCell className="p-2">
-                {new Date(product.createdAt).toLocaleDateString("pt-BR")}{" "}
-                {new Date(product.createdAt).toLocaleTimeString("pt-BR", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </TableCell>
-              <TableCell className="p-2 space-x-2">
-                {/* Dialog de Atualização */}
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button size="sm" onClick={() => handleUpdateClick(product)}>
-                      Atualizar
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Atualizar Produto</DialogTitle>
-                    </DialogHeader>
-                    {selectedProduct && (
-                      <form onSubmit={handleUpdateSubmit} className="space-y-4">
-                        <div>
-                          <Label>Nome</Label>
-                          <Input
-                            value={form.name}
-                            onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
-                          />
-                        </div>
-                        <div>
-                          <Label>Descrição</Label>
-                          <Input
-                            value={form.description}
-                            onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
-                          />
-                        </div>
-                        <div>
-                          <Label>Preço (R$)</Label>
-                          <Input
-                            type="number"
-                            step="0.01"
-                            value={form.price}
-                            onChange={(e) => setForm((prev) => ({ ...prev, price: e.target.value }))}
-                          />
-                        </div>
-                        <div>
-                          <Label>Estoque</Label>
-                          <Input
-                            type="number"
-                            value={form.inStock}
-                            onChange={(e) => setForm((prev) => ({ ...prev, inStock: e.target.value }))}
-                          />
-                        </div>
-                        <div>
-                          <Label>Imagem (URL)</Label>
-                          <Input
-                            value={form.imageUrl}
-                            onChange={(e) => setForm((prev) => ({ ...prev, imageUrl: e.target.value }))}
-                          />
-                        </div>
-                        <DialogClose asChild>
-                          <Button type="submit">Salvar Alterações</Button>
-                        </DialogClose>
-                      </form>
-                    )}
-                  </DialogContent>
-                </Dialog>
-              </TableCell>
-              <TableCell>
-                {/* Dialog de Remoção */}
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button size="sm" variant="destructive">
-                      Remover
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Confirmar Remoção</DialogTitle>
-                    </DialogHeader>
-                    <p>
-                      Você tem certeza que deseja remover o produto <strong>{product.name}</strong>? Esta ação
-                      não pode ser desfeita.
-                    </p>
-                    <div className="flex justify-end gap-2 mt-4">
-                      <DialogClose asChild>
-                        <Button
-                          variant="destructive"
-                          onClick={async () => {
-                            const res = await deleteProduct(product.id)
-                            if (res.success) {
-                              toast.success("Produto removido com sucesso!")
-                            } else {
-                              toast.error(res.error ?? "Erro ao remover produto")
-                            }
-                          }}
-                        >
-                          Confirmar Remoção
-                        </Button>
-                      </DialogClose>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </TableCell>
-            
+
+      <div className="w-full overflow-x-auto rounded border">
+        <Table className="w-full">
+          <TableHeader>
+            <TableRow>
+              <TableHead className="p-2">Imagem</TableHead>
+              <TableHead className="p-2">Nome</TableHead>
+              <TableHead className="p-2">Descrição</TableHead>
+              <TableHead className="p-2">Categoria</TableHead>
+              <TableHead className="p-2">Restaurante</TableHead>
+              <TableHead className="p-2">Preço</TableHead>
+              <TableHead className="p-2">Estoque</TableHead>
+              <TableHead className="p-2">Criado em</TableHead>
+              <TableHead className="p-2">Ações</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+
+          <TableBody>
+            {products.map((product) => (
+              <TableRow key={product.id} className="hover:bg-muted transition">
+                <TableCell className="p-2">
+                  <Image
+                    src={product.imageUrl}
+                    alt={product.name}
+                    width={60}
+                    height={60}
+                    className="rounded object-cover"
+                  />
+                </TableCell>
+                <TableCell className="p-2">{product.name}</TableCell>
+                <TableCell className="p-2 max-w-[200px] truncate">{product.description}</TableCell>
+                <TableCell className="p-2">{product.menuCategory.name}</TableCell>
+                <TableCell className="p-2">{product.restaurant.name}</TableCell>
+                <TableCell className="p-2">R$ {product.price.toFixed(2)}</TableCell>
+                <TableCell className="p-2">{product.inStock}</TableCell>
+                <TableCell className="p-2 text-sm">
+                  {new Date(product.createdAt).toLocaleDateString("pt-BR")}{" "}
+                  {new Date(product.createdAt).toLocaleTimeString("pt-BR", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </TableCell>
+                <TableCell className="p-2 space-y-2">
+                  {/* Dialog Atualizar */}
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        size="sm"
+                        onClick={() => handleUpdateClick(product)}
+                        className="w-full bg-blue-400 hover:bg-blue-300"
+                      >
+                        Atualizar
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-[95vw] sm:max-w-[500px]">
+                      <DialogHeader>
+                        <DialogTitle>Atualizar Produto</DialogTitle>
+                      </DialogHeader>
+                      {selectedProduct && (
+                        <form onSubmit={handleUpdateSubmit} className="space-y-4">
+                          <div>
+                            <Label>Nome</Label>
+                            <Input
+                              value={form.name}
+                              onChange={(e) =>
+                                setForm((prev) => ({ ...prev, name: e.target.value }))
+                              }
+                            />
+                          </div>
+                          <div>
+                            <Label>Descrição</Label>
+                            <Input
+                              value={form.description}
+                              onChange={(e) =>
+                                setForm((prev) => ({ ...prev, description: e.target.value }))
+                              }
+                            />
+                          </div>
+                          <div>
+                            <Label>Preço (R$)</Label>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              value={form.price}
+                              onChange={(e) =>
+                                setForm((prev) => ({ ...prev, price: e.target.value }))
+                              }
+                            />
+                          </div>
+                          <div>
+                            <Label>Estoque</Label>
+                            <Input
+                              type="number"
+                              value={form.inStock}
+                              onChange={(e) =>
+                                setForm((prev) => ({ ...prev, inStock: e.target.value }))
+                              }
+                            />
+                          </div>
+                          <div>
+                            <Label>Imagem (URL)</Label>
+                            <Input
+                              value={form.imageUrl}
+                              onChange={(e) =>
+                                setForm((prev) => ({ ...prev, imageUrl: e.target.value }))
+                              }
+                            />
+                          </div>
+                          <DialogClose asChild>
+                            
+                            <Button type="submit" className="w-full bg-green-500 hover:bg-green-300">
+                              Salvar Alterações
+                            </Button>
+                          </DialogClose>
+                        </form>
+                      )}
+                    </DialogContent>
+                  </Dialog>
+
+                  {/* Dialog Remoção */}
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button size="sm" variant="destructive" className="w-full">
+                        Remover
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-[95vw] sm:max-w-[500px]">
+                      <DialogHeader>
+                        <DialogTitle>Confirmar Remoção</DialogTitle>
+                      </DialogHeader>
+                      <p className="text-sm">
+                        Tem certeza que deseja remover o produto{" "}
+                        <strong>{product.name}</strong>? Esta ação não pode ser desfeita.
+                      </p>
+                      <div className="flex justify-end gap-2 mt-4">
+                        <DialogClose asChild>
+                          <Button
+                            variant="destructive"
+                            onClick={async () => {
+                              const res = await deleteProduct(product.id)
+                              if (res.success) {
+                                toast.success("Produto removido com sucesso!")
+                              } else {
+                                toast.error(res.error ?? "Erro ao remover produto")
+                              }
+                            }}
+                          >
+                            Confirmar Remoção
+                          </Button>
+                        </DialogClose>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   )
 }
