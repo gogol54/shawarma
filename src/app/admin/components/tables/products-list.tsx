@@ -88,7 +88,7 @@ const ProductsListComponent = ({ products }: Props) => {
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-4">
-      <h2 className="text-2xl font-bold mb-4">Lista de Produtos</h2>
+      <h2 className="text-2xl font-bold mb-4 text-center">Lista de Produtos</h2>
 
       <div className="w-full overflow-x-auto rounded border">
         <Table className="w-full">
@@ -138,7 +138,7 @@ const ProductsListComponent = ({ products }: Props) => {
                       <Button
                         size="sm"
                         onClick={() => handleUpdateClick(product)}
-                        className="w-full bg-blue-400 hover:bg-blue-300"
+                        className="w-full text-white bg-blue-400 hover:bg-blue-300"
                       >
                         Atualizar
                       </Button>

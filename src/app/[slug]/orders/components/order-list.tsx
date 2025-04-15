@@ -98,7 +98,7 @@ const OrdersList = ({ orders }: OrdersListProps) => {
             <p className="text-sm font-medium">{formatCurrency(order.total)}</p>
 
             {/* Botão de acompanhamento do pedido */}
-            <TrackOrderButton orderId={order.id} />
+            <TrackOrderButton orderId={order.code} />
           </CardContent>
         </Card>
       ))}

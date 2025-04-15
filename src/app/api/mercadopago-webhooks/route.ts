@@ -21,7 +21,10 @@ export async function POST(req: NextRequest) {
       }).then((res) => res.json());
 
       if (paymentInfo.status === "approved") {
-        const orderId = parseInt(paymentInfo.external_reference); // Pega o ID direto da preferência
+        const orderId = parseInt(paymentInfo.external_reference);
+      
+        const paymentMethod = paymentInfo.payment_method_id?.toUpperCase() || "NONE";
+      
         const order = await db.order.findUnique({
           where: { id: orderId },
         });
@@ -29,9 +32,14 @@ export async function POST(req: NextRequest) {
         if (order) {
           await db.order.update({
             where: { id: order.id },
-            data: { status: "IN_PREPARATION" },
-          });      
-          console.log(`📦 Pedido ${order.id} atualizado para IN_PREPARATION`);
+            data: {
+              status: "IN_PREPARATION",
+              isPaid: true,
+              paymentMethod: paymentMethod, // 👈 aqui salva PIX, CARD etc
+            },
+          });
+      
+          console.log(`📦 Pedido ${order.id} atualizado com status IN_PREPARATION e método ${paymentMethod}`);
         } else {
           console.log("⚠️ Nenhum pedido encontrado com esse ID.");
         }
@@ -46,7 +54,6 @@ export async function POST(req: NextRequest) {
           Authorization: `Bearer ${process.env.MERCADO_PAGO_ACCESS_TOKEN}`,
         },
       }).then((res) => res.json());
-      console.log("✅ Merchant Order Info:", orderInfo);
       const externalReference = orderInfo.external_reference || null;
       if (!externalReference) {
         console.error("❌ external_reference não encontrado na merchant_order!");

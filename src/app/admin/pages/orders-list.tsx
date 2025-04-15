@@ -9,12 +9,16 @@ export default async function OrdersList() {
   const orders = await db.order.findMany({
     select: {
       id: true,
+      code: true,
       total: true,
       status: true,
       consumptionMethod: true,
       customerName: true,
       customerPhone: true,
+      address: true,
       createdAt: true,
+      isPaid: true,
+      paymentMethod: true,
       orderProducts: {
         select: {
           id: true,

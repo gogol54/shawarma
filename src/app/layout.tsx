@@ -14,10 +14,7 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: "Shawarma Rosul",
-  description: "Apenas Alimentação!",
-  icons: {
-    icon: '/public/other.png',
-  },
+  description: "Serviço de Delivery!",
 };
 
 export default function RootLayout({

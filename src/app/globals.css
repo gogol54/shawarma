@@ -17,8 +17,8 @@ body {
     --card-foreground: 0 0% 20%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 20%;
-    --primary: 30 28% 63%;
-    --primary-foreground: 0 0% 98%;
+    --primary: linear-gradient(135deg, #ae8625, #f7ef8a, #ae8625);
+    --primary-foreground: 0 0% 26%; /* HSL de #434343 */
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 20%;
     --muted: 0 0% 96.1%;
@@ -75,5 +75,14 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .bg-primary {
+    background-image: var(--primary);
+    background-size: 200% 200%;
+    background-position: center;
+    color: hsl(var(--primary-foreground));
   }
 }

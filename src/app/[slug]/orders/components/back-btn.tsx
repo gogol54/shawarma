@@ -27,7 +27,7 @@ export const GoBackBtn = () => {
 }
 
 interface TrackOrderButtonProps {
-  orderId: number;
+  orderId: string | null;
 }
 
 export const TrackOrderButton = ({ orderId }: TrackOrderButtonProps) => {

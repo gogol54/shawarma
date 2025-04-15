@@ -9,6 +9,7 @@ const mercadopago = new MercadoPagoConfig({
 
 import { db } from "@/lib/prisma";
 
+import { generateOrderCode } from "../helpers/codeFunction";
 import { removePoints } from "../helpers/cpf";
 
 interface CreateOrderInput {
@@ -24,6 +25,7 @@ interface CreateOrderInput {
   products: Array<{
     id: string;
     name: string;
+    description: string;
     menuCategoryId: string;
     quantity: number;
     dropIng: string[];
@@ -83,6 +85,7 @@ export const createOrder = async (input: CreateOrderInput) => {
   // Criar o pedido no banco de dados
   const orderResponse = await db.order.create({
     data: {
+      code: generateOrderCode(Math.round(Math.random() * 900000)),
       consumptionMethod: input.consumptionMethod,
       status: "PENDING",
       customerName: input.customerName,
@@ -154,6 +157,7 @@ export const createOrder = async (input: CreateOrderInput) => {
             return {
               id: item.id,
               title: `Produto: ${item.quantity} ${item.name}`,
+              description: item.description,
               category_id: item.menuCategoryId,
               quantity: item.quantity,
               currency_id: "BRL",

@@ -4,6 +4,7 @@ import { ConsumptionMethod, OrderStatus } from "@prisma/client"
 import { JsonValue } from "@prisma/client/runtime/library"
 import { useState, useTransition } from "react"
 
+import handleDownloadReceipt from "@/app/helpers/cupom"
 import { formatCurrency } from "@/app/helpers/format-currency"
 import { Button } from "@/components/ui/button"
 import {
@@ -28,11 +29,15 @@ import { updateOrderStatus } from "../../actions/orders-actions"
 type OrdersListComponentProps = {
   orders: {
     id: number
+    code: string | null
     total: number
     status: OrderStatus
     consumptionMethod: ConsumptionMethod
     customerName: string
     customerPhone: string
+    isPaid: boolean
+    address: JsonValue | null
+    paymentMethod: string | null
     createdAt: string // ou Date, dependendo de como vem do backend
     orderProducts: {
       id: string
@@ -120,8 +125,9 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
             <TableHead>ID</TableHead>
             <TableHead>Cliente</TableHead>
             <TableHead>Celular</TableHead>
-            <TableHead>Métôdo</TableHead>
-            <TableHead>Tempo de preparo</TableHead>
+            <TableHead>Entrega</TableHead>
+            <TableHead>Tempo</TableHead>
+            <TableHead>Pagamento</TableHead>
             <TableHead>Total</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Ações</TableHead>
@@ -137,6 +143,9 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
               <TableCell>
                 {getMinutesSince(order.createdAt, order.status)}
               </TableCell>
+              <TableCell>
+                {order.isPaid ? "Pago ✅/\nvia "+order.paymentMethod : "Pendente⚠️"}
+              </TableCell>
               <TableCell>{formatCurrency(order.total)}</TableCell>
               <TableCell>{statusFormatter(order.status)}</TableCell>
               <TableCell className="flex gap-2">
@@ -144,7 +153,7 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
                 <Dialog open={open && activeOrderId === order.id} onOpenChange={setOpen}>
                   <DialogTrigger asChild>
                     <Button onClick={() => handleEditClick(order.id, order.status)} 
-                      className="bg-blue-500 hover:bg-blue-400" >
+                      className="bg-blue-500 hover:bg-blue-400 text-white" >
                       Editar
                     </Button>
                   </DialogTrigger>
@@ -175,7 +184,7 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
                 {/* Botão Visualizar Produtos */}
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button onClick={() => setViewProductsOrderId(order.id)} className="bg-blue-500 hover:bg-blue-400" >
+                    <Button onClick={() => setViewProductsOrderId(order.id)} className="bg-blue-500 hover:bg-blue-400 text-white">
                       Visualizar
                     </Button>
                   </DialogTrigger>
@@ -183,6 +192,13 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
                   <DialogContent className="max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
                       <DialogTitle>Produtos do Pedido #{order.id}</DialogTitle>
+                      <Button
+                        variant="outline"
+                        onClick={() => handleDownloadReceipt(order)}
+                        className="mt-2 text-sm bg-green-500 hover:bg-green-600 text-white"
+                      >
+                        Baixar Comprovante
+                      </Button>
                       {order.orderProducts.length > 0 ? (
                         order.orderProducts.map((product, index) => (
                           <div
