@@ -43,7 +43,7 @@ const handleDownloadReceipt = (order: Order) => {
   function getFormattedAddress(address: unknown): string {
     try {
       const { street, number, zone } = address as AddressData;
-      return `${street}\n, ${number} - ${zone}`;
+      return `${street}, ${number} - ${zone}`;
     } catch {
       return "Retirada no local";
     }
