@@ -8,14 +8,18 @@ import { axiosInstance } from '@/lib/utils';
 const AdminLogin = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false); // 👈 estado de loading
 
   const handleLogin = async (): Promise<void> => {
+    setLoading(true); // 👈 ativa loading
     try {
       await axiosInstance.post('/api/admin', { email, password });
       toast.success('Link enviado com sucesso! Verifique seu email.');
     } catch (error) {
-      console.log(error)
+      console.log(error);
       toast.error('Credenciais inválidas ou erro no envio do link.');
+    } finally {
+      setLoading(false); // 👈 desativa loading
     }
   };
 
@@ -38,12 +42,15 @@ const AdminLogin = () => {
       />
       <button
         onClick={handleLogin}
-        className="bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700 transition"
+        disabled={loading} // 👈 desativa o botão durante o loading
+        className={`bg-blue-600 text-white rounded px-4 py-2 transition w-full max-w-sm ${
+          loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'
+        }`}
       >
-        Enviar Link de Acesso
+        {loading ? 'Enviando...' : 'Enviar Link de Acesso'}
       </button>
     </div>
   );
-}
+};
 
-export default AdminLogin
+export default AdminLogin;
