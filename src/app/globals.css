@@ -4,10 +4,7 @@
 
 body {
   font-family: Arial, Helvetica, sans-serif;
-  width: 100%; /* Garante que ocupe toda a largura disponível */
-  background-color: #f5f5f5; /* Exemplo de cor de fundo */
 }
-
 
 @layer base {
   :root {
@@ -17,8 +14,8 @@ body {
     --card-foreground: 0 0% 20%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 20%;
-    --primary: linear-gradient(135deg, #ae8625, #f7ef8a, #ae8625);
-    --primary-foreground: 0 0% 26%; /* HSL de #434343 */
+    --primary: 30 28% 63%;
+    --primary-foreground: 0 0% 98%;
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 20%;
     --muted: 0 0% 96.1%;
@@ -36,24 +33,6 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-  .dark {
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 
@@ -66,23 +45,5 @@ body {
   }
   html {
     @apply h-full;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
-
-@layer utilities {
-  .bg-primary {
-    background-image: var(--primary);
-    background-size: 200% 200%;
-    background-position: center;
-    color: hsl(var(--primary-foreground));
   }
 }

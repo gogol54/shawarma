@@ -92,10 +92,10 @@ const handleDownloadReceipt = (order: Order) => {
     center("SHAWARMA ROSUL"),
     "=".repeat(MAX_LINE_WIDTH),
 
-    center("CNPJ: 00.000.000/0001-00"),
-    center("Rua Amaro Souto, 3023"),
+    center("CNPJ: 60.457.577/0001-59"),
+    center("Rua Amaro Souto, 3023"),  
     center("Apto 210 - Centro"),
-    center("Tel: (55) 98118-0042"),
+    center("Tel: (55) 99683-8707"),
     "=".repeat(MAX_LINE_WIDTH),
     center(`PEDIDO #${order.code}`),
     `Data/Hora: ${formatDate(order.createdAt)}`,
@@ -134,7 +134,7 @@ const handleDownloadReceipt = (order: Order) => {
 
     "=".repeat(MAX_LINE_WIDTH),
     center("Obrigado pela preferência!"),
-    center("Volte sempre! S2"),
+    center("Volte sempre!"),
     "=".repeat(MAX_LINE_WIDTH),
   ];
 

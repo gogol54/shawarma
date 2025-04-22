@@ -4,7 +4,7 @@ import { Prisma } from "@prisma/client";
 import { ClockIcon, LockIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { formatCurrency } from "@/app/helpers/format-currency";
 import { isOpenRestaurant } from "@/app/helpers/is-open";
@@ -28,13 +28,29 @@ interface RestaurantCategoriesProps {
 const RestaurantCategories = ({ restaurant }: RestaurantCategoriesProps) => {
   const { products, total, totalQuantity, setIsOpen } = useContext(CartContext);
 
-  // Agora selecionamos a categoria inteira e não apenas o nome
-  const [selectedCategory, setSelectedCategory] = useState(
-    restaurant.menuCategories[0] || null
-  );
+  const [selectedCategory, setSelectedCategory] = useState<typeof restaurant.menuCategories[0] | null>(null);
+
+  useEffect(() => {
+    const savedCategoryName = localStorage.getItem("selectedCategory");
+
+    if (savedCategoryName) {
+      const foundCategory = restaurant.menuCategories.find(
+        (cat) => cat.name === savedCategoryName
+      );
+
+      if (foundCategory) {
+        setSelectedCategory(foundCategory);
+      } else {
+        setSelectedCategory(restaurant.menuCategories[0]);
+      }
+    } else {
+      setSelectedCategory(restaurant.menuCategories[0]);
+    }
+  }, [restaurant.menuCategories]);
 
   const handleCategoryClick = (category: typeof restaurant.menuCategories[0]) => {
     setSelectedCategory(category);
+    localStorage.setItem("selectedCategory", category.name);
   }
 
   const open = isOpenRestaurant();
@@ -121,7 +137,6 @@ const RestaurantCategories = ({ restaurant }: RestaurantCategoriesProps) => {
 
       <h3 className="font-semibold px-5 pt-8">{selectedCategory?.name}</h3>
 
-      {/* Passamos os produtos da categoria corretamente */}
       <Products products={selectedCategory?.products.filter(product => product.inStock > 0) || []} />
 
       {products.length > 0 && (

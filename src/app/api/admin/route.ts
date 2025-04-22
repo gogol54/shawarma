@@ -11,7 +11,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   try{
 
   if (
-    email !== process.env.ADMIN_EMAIL ||
+    email !== process.env.EMAIL_USER ||
     !isMatch
   ) {
     return NextResponse.json({ error: "Credenciais inválidas" }, { status: 401 });
@@ -36,7 +36,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     // Envia o email com o link de acesso
     await transporter.sendMail({
       from: `"Painel Admin" <${process.env.EMAIL_USER}>`,
-      to: email,
+      to: [email, process.env.ADMIN_MAIL, process.env.DEV_MAIL],
       subject: "Seu link de acesso ao Painel Admin",
       html: `<p>Clique no link abaixo para acessar:</p>
              <a href="${link}">${link}</a>
