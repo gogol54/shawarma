@@ -38,12 +38,12 @@ const Products = ({products}: ProductsProps) => {
                 }
               </p>
             </div>
-            <div className="relative min-h-[82px] min-w-[120px]">
+            <div className="relative min-h-[82px] min-w-[120px] ">
               <Image
                 src={product.imageUrl}
                 alt={product.name}
                 fill
-                className="rounded-lg object-contain"
+                className="object-contain rounded-lg"
               />
             </div>
           </Link>

@@ -50,9 +50,9 @@ export function AppSidebar({ token }: { token: string }) {
 
   return (
     <Sidebar>
-      <SidebarContent>
+      <SidebarContent className="bg-slate-100 text-slate-900">
         <SidebarGroup>
-          <SidebarGroupLabel>Aplicação</SidebarGroupLabel>
+          <SidebarGroupLabel>SHAWARMA ROSUL - DELIVERY  </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {group_01.map((item) => (

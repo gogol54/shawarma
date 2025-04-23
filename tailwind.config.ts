@@ -13,6 +13,8 @@ export default {
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
+				chocolate: '#342A22',
+        darkolive: '#10110E',
   			card: {
   				DEFAULT: 'hsl(var(--card))',
   				foreground: 'hsl(var(--card-foreground))'
@@ -62,6 +64,9 @@ export default {
   				ring: 'hsl(var(--sidebar-ring))'
   			}
   		},
+			backgroundImage: {
+        'custom-gradient': 'linear-gradient(0deg, #342A22, #10110E)',
+      },
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',

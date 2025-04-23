@@ -31,7 +31,7 @@ const ProductHeader = ({ product, slug }: ProductHeaderProps) => {
     <Image 
       src={product?.imageUrl} 
       alt={product?.name}
-      className="object-contain 0 z-10 bg-[#F6E7C5]" 
+      className="object-contain bg-custom-gradient z-10" 
       fill
     />
     <Button 
