@@ -29,7 +29,8 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
       </head>
       <body className={`${poppins.className} antialiased`}>
-        <Script src="https://www.mercadopago.com/v2/security.js" strategy="beforeInteractive"/>        
+        <Script src="https://www.mercadopago.com/v2/security.js" strategy="beforeInteractive" />
+        <Script src="https://www.mercadopago.com/v2/security.js" strategy="lazyOnload" />
           <CartProvider>
             {/* <div className="max-w-screen-lg mx-auto"> */}
               {children}

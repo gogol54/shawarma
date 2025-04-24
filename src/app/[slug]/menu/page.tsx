@@ -21,7 +21,6 @@ const RestaurantMenuPage = async ({params, searchParams}: RestaurantMenuProps) =
     where: {slug},
     include: {
       menuCategories: {
-     
         include: {
           products: true
         },

@@ -32,7 +32,7 @@ interface TrackOrderButtonProps {
 
 export const TrackOrderButton = ({ orderId }: TrackOrderButtonProps) => {
   const handleClick = () => {
-    const whatsappNumber = "+55" + "55981376693"
+    const whatsappNumber = "+55" + "55996838707"
     const message = `Olá, estou acompanhando o pedido #${orderId}`
     const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
     
