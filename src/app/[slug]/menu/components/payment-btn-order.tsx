@@ -74,6 +74,7 @@ const FinishDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
     startTransition(async () => {
       try {
         const consumptionMethod = search.get("consumptionMethod") as ConsumptionMethod;
+
         const response = await createOrder({
           consumptionMethod,
           customerCpf: data.cpf,
@@ -90,14 +91,14 @@ const FinishDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
           control: payOnDelivery
         });
 
-        if (response?.redirectUrl) {
+        if (response?.orderId) {
           clearCart();
           setIsOpen(false);
           onOpenChange(false);
           toast.success("Agradecemos pela preferência!");
-          window.location.href = response.redirectUrl;
+          window.location.href = `/checkout/${response.orderId}`;
         } else {
-          toast.error("Erro ao redirecionar para o pagamento.");
+          toast.error("Erro ao iniciar pagamento.");
         }
       } catch (error) {
         toast.error("Algum erro foi encontrado, tente novamente!");

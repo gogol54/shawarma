@@ -84,11 +84,11 @@ export default function CheckoutPage() {
       )}
       <button
         onClick={() =>
-          window.location.href = `/rosul/orders?phone=${phone}`
+          window.location.href = `/rosul`
         }
         className="mt-6 px-4 py-2 bg-blue-500 hover:bg-blue-600 transition-colors text-white rounded"
       >
-        Voltar para a loja
+        Voltar para o shawarma
       </button>
     </div>
   );
