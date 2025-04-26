@@ -2,12 +2,49 @@
 
 import { useEffect, useState } from 'react';
 
+interface FormData {
+  [key: string]: string | number | boolean;
+}
+
+interface PaymentMethod {
+  [key: string]: string | number | boolean;
+}
+
+interface OnSubmitArgs {
+  selectedPaymentMethod: PaymentMethod;
+  formData: FormData;
+}
+
+declare global {
+  interface Window {
+    MercadoPago: new (publicKey: string, options: { locale: string }) => {
+      bricks: () => {
+        create: (
+          type: string,
+          containerId: string,
+          config: {
+            initialization: { amount: number; preferenceId: string };
+            customization: { paymentMethods: Record<string, string> };
+            callbacks: {
+              onReady: () => void;
+              onSubmit: (args: OnSubmitArgs) => void;
+              onError: (error: Error) => void;
+            };
+          }
+        ) => void;
+      };
+    };
+  }
+}
+
 export default function CheckoutPage({ orderId }: { orderId: string }) {
   const [amount, setAmount] = useState<number | null>(null);
-  console.log('chegou no checkoutPage', orderId)
+
+  console.log('chegou no checkoutPage', orderId);
+
   useEffect(() => {
-    if (!orderId) return; // <-- adicione isso
-  
+    if (!orderId) return;
+
     const fetchData = async () => {
       try {
         const res = await fetch(`/api/brick-preference?orderId=${orderId}`);
@@ -17,7 +54,7 @@ export default function CheckoutPage({ orderId }: { orderId: string }) {
         console.error('Erro ao buscar dados da ordem:', error);
       }
     };
-  
+
     fetchData();
   }, [orderId]);
 
@@ -29,7 +66,7 @@ export default function CheckoutPage({ orderId }: { orderId: string }) {
     script.async = true;
 
     script.onload = () => {
-      const mp = new (window as any).MercadoPago(process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY, {
+      const mp = new window.MercadoPago(process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY!, {
         locale: 'pt-BR',
       });
 
@@ -47,7 +84,7 @@ export default function CheckoutPage({ orderId }: { orderId: string }) {
         },
         callbacks: {
           onReady: () => console.log('Brick pronto'),
-          onSubmit: async ({ selectedPaymentMethod, formData }: any) => {
+          onSubmit: async ({ selectedPaymentMethod, formData }: OnSubmitArgs) => {
             try {
               const res = await fetch('/api/process-payment', {
                 method: 'POST',
@@ -59,22 +96,22 @@ export default function CheckoutPage({ orderId }: { orderId: string }) {
                   amount,
                 }),
               });
-          
+
               const data = await res.json();
-          
+
               if (!res.ok) {
                 console.error('Erro no processamento:', data);
                 alert(data?.error || 'Erro ao processar pagamento');
                 return;
               }
-          
+
               console.log('Pagamento processado:', data);
             } catch (err) {
               console.error('Erro ao processar pagamento:', err);
               alert('Erro ao processar pagamento');
             }
           },
-          onError: (error: any) => {
+          onError: (error: Error) => {
             console.error('Erro no Brick:', error);
           },
         },

@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+
 import CheckoutPage from '@/components/CheckoutPage';
 
 export default async function CheckoutWrapper({ params }: { params: { orderId: string } }) {

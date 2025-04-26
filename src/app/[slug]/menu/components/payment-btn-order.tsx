@@ -89,17 +89,27 @@ const FinishDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
           products,
           slug: safeSlug,
           control: payOnDelivery
-        });
-
-        if (response?.orderId) {
+        });  
+        
+        if (response?.redirectUrl) {
           clearCart();
           setIsOpen(false);
           onOpenChange(false);
           toast.success("Agradecemos pela preferência!");
-          window.location.href = `/checkout/${response.orderId}`;
+          window.location.href = response.redirectUrl;
         } else {
-          toast.error("Erro ao iniciar pagamento.");
+          toast.error("Erro ao redirecionar para o pagamento.");
         }
+
+        // if (response?.orderId) {
+        //   clearCart();
+        //   setIsOpen(false);
+        //   onOpenChange(false);
+        //   toast.success("Agradecemos pela preferência!");
+        //   window.location.href = `/checkout/${response.orderId}`;
+        // } else {
+        //   toast.error("Erro ao iniciar pagamento.");
+        // }
       } catch (error) {
         toast.error("Algum erro foi encontrado, tente novamente!");
         console.log(error);
