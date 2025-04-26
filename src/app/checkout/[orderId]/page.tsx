@@ -2,11 +2,12 @@ import { Suspense } from 'react';
 
 import CheckoutPage from '@/components/CheckoutPage';
 
-export default async function CheckoutWrapper({ params }: { params: { orderId: string } }) {
-  const { orderId } = params; // Desestruturado, mas pode ser await se vier de `generateStaticParams`
+interface CheckoutWrapperProps {
+  params: Promise<{ orderId: string }>;
+}
 
-  console.log('chegou no checkoutWrapper', orderId);
-
+export default async function CheckoutWrapper({ params }: CheckoutWrapperProps) {
+  const { orderId } = await params;  // Desestruturado, mas pode ser await se vier de `generateStaticParams`
   return (
     <Suspense fallback={<div>Carregando...</div>}>
       <CheckoutPage orderId={orderId} />
