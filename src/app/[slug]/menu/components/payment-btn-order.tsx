@@ -28,7 +28,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-
+import { isOpenRestaurant } from "@/app/helpers/is-open";
 import { createOrder } from "../actions/create-order";
 import { CartContext } from "../contexts/cart";
 import { validateCPF } from "../helpers/cpf";
@@ -73,8 +73,14 @@ const FinishDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
   const onSubmit = (data: FormSchema) => {
     startTransition(async () => {
       try {
+        // Verificar se o restaurante está aberto
+        if (!isOpenRestaurant()) {
+          toast.error("O restaurante está fechado. Não é possível processar o pagamento no momento.");
+          return; // Bloqueia o pagamento
+        }
+  
         const consumptionMethod = search.get("consumptionMethod") as ConsumptionMethod;
-
+  
         const response = await createOrder({
           consumptionMethod,
           customerCpf: data.cpf,
@@ -90,7 +96,7 @@ const FinishDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
           slug: safeSlug,
           control: payOnDelivery
         });  
-        
+  
         if (response?.redirectUrl) {
           clearCart();
           setIsOpen(false);
@@ -100,16 +106,6 @@ const FinishDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
         } else {
           toast.error("Erro ao redirecionar para o pagamento.");
         }
-
-        // if (response?.orderId) {
-        //   clearCart();
-        //   setIsOpen(false);
-        //   onOpenChange(false);
-        //   toast.success("Agradecemos pela preferência!");
-        //   window.location.href = `/checkout/${response.orderId}`;
-        // } else {
-        //   toast.error("Erro ao iniciar pagamento.");
-        // }
       } catch (error) {
         toast.error("Algum erro foi encontrado, tente novamente!");
         console.log(error);
