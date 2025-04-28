@@ -206,10 +206,11 @@ export const createOrder = async (input: CreateOrderInput) => {
         external_reference: JSON.stringify(orderResponse.id)
       },
     });
-    return { redirectUrl: response.init_point };
-    // return {
-    //   orderId: orderResponse.id,
-    //   total: orderResponse.total,
-    // };
+    //return { redirectUrl: response.init_point };
+    return {
+      orderId: orderResponse.id,
+      total: orderResponse.total,
+      preferenceId: response.id, // 👈 passando o preferenceId pra frente
+    };
   }
 };

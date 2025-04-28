@@ -28,7 +28,7 @@ export async function POST(req: Request) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`,
+        Authorization: `Bearer ${process.env.MERCADO_PAGO_ACCESS_TOKEN}`,
         'X-Idempotency-Key': uuidv4(), // ✅ Header obrigatório
       },
       body: JSON.stringify(paymentPayload),

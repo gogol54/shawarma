@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';  // Para redirecionamento
 import { useEffect, useState } from 'react';
 
 interface FormData {
@@ -37,8 +38,10 @@ declare global {
   }
 }
 
-export default function CheckoutPage({ orderId }: { orderId: string }) {
+export default function CheckoutPage({ orderId, preferenceId }: { orderId: string, preferenceId: string }) {
   const [amount, setAmount] = useState<number | null>(null);
+  const router = useRouter();  // Para redirecionamento de página
+  console.log(router)
 
   console.log('chegou no checkoutPage', orderId);
 
@@ -73,7 +76,7 @@ export default function CheckoutPage({ orderId }: { orderId: string }) {
       mp.bricks().create('payment', 'brick_container', {
         initialization: {
           amount,
-          preferenceId: orderId,
+          preferenceId,
         },
         customization: {
           paymentMethods: {
@@ -92,7 +95,7 @@ export default function CheckoutPage({ orderId }: { orderId: string }) {
                 body: JSON.stringify({
                   selectedPaymentMethod,
                   formData,
-                  preferenceId: orderId,
+                  preferenceId,
                   amount,
                 }),
               });
@@ -106,6 +109,16 @@ export default function CheckoutPage({ orderId }: { orderId: string }) {
               }
 
               console.log('Pagamento processado:', data);
+
+              // Redirecionamento com base no status do pagamento
+              if (data?.status === 'approved') {
+                alert      ('approved') // Redireciona para a página de sucesso
+              } else if (data?.status === 'rejected') {
+                alert('rejected') // Redireciona para a página de falha
+              } else {
+                alert('failure') // Redireciona para a página de pendente
+              }
+
             } catch (err) {
               console.error('Erro ao processar pagamento:', err);
               alert('Erro ao processar pagamento');
@@ -119,7 +132,7 @@ export default function CheckoutPage({ orderId }: { orderId: string }) {
     };
 
     document.body.appendChild(script);
-  }, [amount, orderId]);
+  }, [amount, orderId, preferenceId]);
 
   if (amount === null) return <div>Carregando pagamento...</div>;
 

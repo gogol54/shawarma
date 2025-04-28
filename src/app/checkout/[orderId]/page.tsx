@@ -1,16 +1,19 @@
-import { Suspense } from 'react';
+// /checkout/[orderId]/page.tsx
+// sem 'use client' aqui
 
 import CheckoutPage from '@/components/CheckoutPage';
-
-interface CheckoutWrapperProps {
+interface CheckoutProps {
   params: Promise<{ orderId: string }>;
+  searchParams: Promise<{ preferenceId: string }>;
 }
 
-export default async function CheckoutWrapper({ params }: CheckoutWrapperProps) {
-  const { orderId } = await params;  // Desestruturado, mas pode ser await se vier de `generateStaticParams`
-  return (
-    <Suspense fallback={<div>Carregando...</div>}>
-      <CheckoutPage orderId={orderId} />
-    </Suspense>
-  );
+export default async function Checkout({ params, searchParams }: CheckoutProps) {
+  const { orderId } = await params;
+  const { preferenceId } = await searchParams;
+
+  if (!preferenceId) {
+    return <div>Erro: preferenceId não encontrado!</div>;
+  }
+
+  return <CheckoutPage orderId={orderId} preferenceId={preferenceId} />;
 }
