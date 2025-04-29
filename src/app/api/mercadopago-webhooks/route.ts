@@ -4,7 +4,7 @@ import { db } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-
+  console.log(searchParams) 
   const id = searchParams.get("data.id") || searchParams.get("id"); // Suporte para ambas as estruturas
   const topic = searchParams.get("type") || searchParams.get("topic"); // Suporte para ambas as estruturas
 

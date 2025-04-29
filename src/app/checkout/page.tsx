@@ -1,14 +1,13 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useRouter,useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function CheckoutPage() {
+export default function CheckoutRedirect() {
   const searchParams = useSearchParams();
-  const initialStatus = searchParams.get("status");
-  const phone = searchParams.get("phone");
+  const router = useRouter();
 
-  const [status, setStatus] = useState(initialStatus || "unknown");
+  const status = searchParams.get("status") || "unknown";
   const [isLoading, setIsLoading] = useState(false);
 
   const messages = {
@@ -35,36 +34,19 @@ export default function CheckoutPage() {
   };
 
   useEffect(() => {
-    if (initialStatus !== "pending") return;
+    // Caso seja pending, pode aguardar ou fazer polling se quiser
+    if (status === "pending") {
+      setIsLoading(true);
+      return;
+    }
 
-    let attempts = 0;
-    const maxAttempts = 3;
+    // Redireciona para home após 5 segundos
+    const timer = setTimeout(() => {
+      router.push("/rosul");
+    }, 5000);
 
-    setIsLoading(true);
-
-    const checkPayment = async () => {
-      const res = await fetch(`/api/check-payment?phone=${phone}`);
-      const data = await res.json();
-
-      if (data.status === "approved") {
-        setStatus("success");
-        setIsLoading(false);
-      } else if (data.status === "rejected") {
-        setStatus("failure");
-        setIsLoading(false);
-      } else {
-        attempts++;
-        if (attempts < maxAttempts) {
-          setTimeout(checkPayment, 3000);
-        } else {
-          setIsLoading(false);
-          setStatus("pending");
-        }
-      }
-    };
-
-    checkPayment();
-  }, [initialStatus, phone]);
+    return () => clearTimeout(timer);
+  }, [status, router]);
 
   const statusMessage = messages[status as keyof typeof messages];
 
@@ -80,12 +62,14 @@ export default function CheckoutPage() {
           {status === "pending" && isLoading && (
             <div className="mt-4 animate-spin h-6 w-6 border-4 border-yellow-500 border-t-transparent rounded-full"></div>
           )}
+
+          {status !== "pending" && (
+            <p className="mt-4 text-sm text-gray-500">Redirecionando para o shawarma...</p>
+          )}
         </>
       )}
       <button
-        onClick={() =>
-          window.location.href = `/rosul`
-        }
+        onClick={() => router.push("/rosul")}
         className="mt-6 px-4 py-2 bg-blue-500 hover:bg-blue-600 transition-colors text-white rounded"
       >
         Voltar para o shawarma

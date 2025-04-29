@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';  // Para redirecionamento
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 interface FormData {
   [key: string]: string | number | boolean;
@@ -42,9 +43,6 @@ export default function CheckoutPage({ orderId, preferenceId }: { orderId: strin
   const [amount, setAmount] = useState<number | null>(null);
   const router = useRouter();  // Para redirecionamento de página
   console.log(router)
-
-  console.log('chegou no checkoutPage', orderId);
-
   useEffect(() => {
     if (!orderId) return;
 
@@ -86,7 +84,7 @@ export default function CheckoutPage({ orderId, preferenceId }: { orderId: strin
           },
         },
         callbacks: {
-          onReady: () => console.log('Brick pronto'),
+          onReady: () => console.log('Brick iniciado'),
           onSubmit: async ({ selectedPaymentMethod, formData }: OnSubmitArgs) => {
             try {
               const res = await fetch('/api/process-payment', {
@@ -107,18 +105,16 @@ export default function CheckoutPage({ orderId, preferenceId }: { orderId: strin
                 alert(data?.error || 'Erro ao processar pagamento');
                 return;
               }
-
-              console.log('Pagamento processado:', data);
-
-              // Redirecionamento com base no status do pagamento
-              if (data?.status === 'approved') {
-                alert      ('approved') // Redireciona para a página de sucesso
-              } else if (data?.status === 'rejected') {
-                alert('rejected') // Redireciona para a página de falha
+              if (data.data.status === 'approved') {
+                toast.success('Pagamento aprovado com sucesso!');
+                router.push('/checkout?status=success');
+              } else if (data.data.status === 'rejected') {
+                toast.error('Pagamento rejeitado, tente novamente!');
+                router.push('/checkout?status=failure');
               } else {
-                alert('failure') // Redireciona para a página de pendente
+                toast.warning('Pagamento pendente ou falhou, tente novamente!');
+                router.push('/checkout?status=unknown');
               }
-
             } catch (err) {
               console.error('Erro ao processar pagamento:', err);
               alert('Erro ao processar pagamento');

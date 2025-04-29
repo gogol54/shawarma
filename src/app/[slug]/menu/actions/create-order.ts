@@ -2,11 +2,7 @@
 
 import { ConsumptionMethod } from "@prisma/client";
 import { MercadoPagoConfig, Preference } from "mercadopago";
-import pagarme from 'pagarme'
 
-const client = await pagarme.client.connect({ api_key: process.env.PAGARME_SECRET_KEY! })
-
-console.log(client)
 const mercadopago = new MercadoPagoConfig({
   accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN!,
 });
@@ -210,11 +206,11 @@ export const createOrder = async (input: CreateOrderInput) => {
         external_reference: JSON.stringify(orderResponse.id)
       },
     });
-    return { redirectUrl: response.init_point };
-    // return {
-    //   orderId: orderResponse.id,
-    //   total: orderResponse.total,
-    //   preferenceId: response.id, // 👈 passando o preferenceId pra frente
-    // };
+    //return { redirectUrl: response.init_point };
+     return {
+      orderId: orderResponse.id,
+      total: orderResponse.total,
+      preferenceId: response.id, // 👈 passando o preferenceId pra frente
+    };
   }
 };
