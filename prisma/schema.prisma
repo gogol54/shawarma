@@ -57,6 +57,7 @@ model Product {
 model Order {
   id                Int               @id @default(autoincrement())
   code              String?           @unique
+  preferenceId      String?          
   total             Float
   status            OrderStatus
   consumptionMethod ConsumptionMethod

@@ -6,8 +6,6 @@ import {v4 as uuidv4 } from 'uuid'
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log('Recebido na API:', body);
-
     const paymentPayload = {
       transaction_amount: body.formData.transaction_amount,
       token: body.formData.token,

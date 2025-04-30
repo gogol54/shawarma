@@ -98,14 +98,14 @@ const FinishDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
           control: payOnDelivery
         });  
 
-        if (response?.orderId && response?.preferenceId) {
+        if (response?.orderId) {
           clearCart();
           setIsOpen(false);
           onOpenChange(false);
           toast.success("Agradecemos pela preferência!");
   
           // Redireciona para o checkout com o preferenceId
-          window.location.href = `/checkout/${response.orderId}?preferenceId=${response.preferenceId}`;
+          window.location.href = `/checkout/${response.orderId}`;
         } else {
           toast.error("Erro ao iniciar pagamento.");
         }

@@ -176,9 +176,7 @@ export const createOrder = async (input: CreateOrderInput) => {
               ]
             : []),
         ],
-        metadata: {
-          orderId: orderResponse.id,
-        },
+        metadata: { internal_order_id: orderResponse.id.toString() },
         payer: {
           name: input.customerName,
           phone: {
@@ -205,15 +203,17 @@ export const createOrder = async (input: CreateOrderInput) => {
         },
         auto_return: "approved",
         notification_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/mercadopago-webhooks`,
-        external_reference: orderResponse.id.toString()
+        external_reference: JSON.stringify(orderResponse.id)
       },
     });
-    //return { redirectUrl: response.init_point };
-    console.log('RESPONSE CREATE PREFERENCE:', response)
-     return {
+    
+    await db.order.update({
+      where: { id: orderResponse.id },
+      data: { preferenceId: response.id }
+    });
+
+    return {
       orderId: orderResponse.id,
-      total: orderResponse.total,
-      preferenceId: response.id, // 👈 passando o preferenceId pra frente
     };
   }
 };

@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 interface FormData {
@@ -28,13 +28,95 @@ declare global {
           type: string,
           containerId: string,
           config: {
-            initialization: {amount:number, preferenceId: string };
-            metadata?: Record<string, any>;
-            customization: { paymentMethods: Record<string, string> };
+            initialization: {
+              amount: number;
+              preferenceId: string;
+              external_reference: string,
+              // external_reference: string,
+              // payer?: {
+              //   name?: string;
+              //   email?: string;
+              //   firstName?: string;
+              //   lastName?: string;
+              //   phone?: {
+              //     area_code?: string;
+              //     number?: string;
+              //   };
+              //   identification?: {
+              //     type?: string;
+              //     number?: string;
+              //   };
+              //   address?: {
+              //     zip_code?: string;
+              //     street_name?: string;
+              //     street_number?: string | number;
+              //     complement?: string;
+              //   };
+              //   date_created?: string;
+              // };
+              // billing?: {
+              //   firstName?: string;
+              //   lastName?: string;
+              //   taxRegime?: string;
+              //   taxIdentificationNumber?: string;
+              //   identification?: {
+              //     type?: string;
+              //     number?: string;
+              //   };
+              //   billingAddress?: {
+              //     streetName?: string;
+              //     streetNumber?: string | number;
+              //     neighborhood?: string;
+              //     city?: string;
+              //     federalUnit?: string;
+              //     zipCode?: string;
+              //   };
+              // };
+              // shipping?: {
+              //   costs?: number;
+              //   shippingMode?: string;
+              //   description?: string;
+              //   receiverAddress?: {
+              //     streetName?: string;
+              //     streetNumber?: string | number;
+              //     neighborhood?: string;
+              //     city?: string;
+              //     federalUnit?: string;
+              //     zipCode?: string;
+              //     additionalInformation?: string;
+              //   };
+              // };
+              // discounts?: {
+              //   totalDiscountsAmount?: number;
+              //   discountsList?: {
+              //     name: string;
+              //     value: number;
+              //   }[];
+              // };
+              // items?: {
+              //   totalItemsAmount?: number;
+              //   itemsList?: {
+              //     units: number;
+              //     value: number;
+              //     name: string;
+              //     description?: string;
+              //     imageURL?: string;
+              //   }[];
+              // };
+            };
+            customization: {
+              paymentMethods: Record<string, string>;
+              enableReviewStep?: boolean;
+              reviewCardsOrder?: string[];
+            };
             callbacks: {
               onReady: () => void;
               onSubmit: (args: OnSubmitArgs) => void;
               onError: (error: Error) => void;
+              onClickEditShippingData?: () => void;
+              onClickEditBillingData?: () => void;
+              onRenderNextStep?: (currentStep: string) => void;
+              onRenderPreviousStep?: (currentStep: string) => void;
             };
           }
         ) => void;
@@ -46,100 +128,103 @@ declare global {
 export default function CheckoutPage({
   orderId,
   preferenceId,
-  amount,
+  amount
 }: {
   orderId: string;
   preferenceId: string;
-  amount: number;
+  amount: number
 }) {
-  const router = useRouter()
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+  
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://sdk.mercadopago.com/js/v2';
     script.async = true;
 
-    script.onload = () => {
-      // Inicializa o MercadoPago SDK com a chave pública
-      const mp = new window.MercadoPago(
-        process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY!,
-        { locale: 'pt-BR' }
-      );
+    script.onload = async () => {
+      try {
+        // Busca o preferenceId da API
+        const mp = new window.MercadoPago(
+          process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY!,
+          { locale: 'pt-BR' }
+        );
 
-      // Cria o brick de pagamento
-      mp.bricks().create('payment', 'brick_container', {
-        initialization: {
-          preferenceId, // ID da preferência do pagamento
-          amount,        // Valor total da ordem (obrigatório)
-        },
-        metadata: {
-          orderId: orderId.toString(), // 
-        },
-        customization: {
-          paymentMethods: {
-            ticket: 'all',        // Opções de pagamento
-            bankTransfer: 'all',  // Opções de pagamento
-            creditCard: 'all',    // Opções de pagamento
+        mp.bricks().create('payment', 'brick_container', {
+          initialization: {
+            preferenceId,
+            amount,
+            external_reference: orderId
           },
-        },
-        callbacks: {
-          onReady: () => {
-            console.log('Brick iniciado');
+          customization: {
+            paymentMethods: {
+              ticket: 'all',
+              bankTransfer: 'all',
+              creditCard: 'all',
+            },
           },
-          onSubmit: async ({ selectedPaymentMethod, formData }: OnSubmitArgs) => {
-            try {
-              const res = await fetch('/api/process-payment', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  selectedPaymentMethod,
-                  formData,
-                  preferenceId,
-                  amount,
-                }),
-              });
+          callbacks: {
+            onReady: () => {
+              setIsLoading(false);
+              console.log('Brick iniciado');
+            },
+            onSubmit: async ({ selectedPaymentMethod, formData }: OnSubmitArgs) => {
+              try {
+                const res = await fetch('/api/process-payment', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    selectedPaymentMethod,
+                    formData,
+                    preferenceId,
+                  }),
+                });
 
-              const data = await res.json();
+                const data = await res.json();
 
-              if (!res.ok) {
-                console.error('Erro no processamento:', data);
-                alert(data?.error || 'Erro ao processar pagamento');
-                return;
+                if (!res.ok) {
+                  console.error('Erro no processamento:', data);
+                  alert(data?.error || 'Erro ao processar pagamento');
+                  return;
+                }
+
+                if (data.data.status === 'approved') {
+                  toast.success('Pagamento aprovado com sucesso!');
+                  router.push('/checkout?status=success');
+                } else if (data.data.status === 'rejected') {
+                  toast.error('Pagamento rejeitado, tente novamente!');
+                  router.push('/checkout?status=failure');
+                } else {
+                  toast.warning('Pagamento pendente ou falhou, tente novamente!');
+                  router.push('/checkout?status=unknown');
+                }
+              } catch (err) {
+                console.error('Erro ao processar pagamento:', err);
+                alert('Erro ao processar pagamento');
               }
-              if (data.data.status === 'approved') {
-                toast.success('Pagamento aprovado com sucesso!');
-                router.push('/checkout?status=success');
-              } else if (data.data.status === 'rejected') {
-                toast.error('Pagamento rejeitado, tente novamente!');
-                router.push('/checkout?status=failure');
-              } else {
-                toast.warning('Pagamento pendente ou falhou, tente novamente!');
-                router.push('/checkout?status=unknown');
-              }
-            } catch (err) {
-              console.error('Erro ao processar pagamento:', err);
-              alert('Erro ao processar pagamento');
-            }
+            },
+            onError: (error: Error) => {
+              console.error('Erro no Brick:', error);
+            },
           },
-          onError: (error: Error) => {
-            console.error('Erro no Brick:', error);
-          },
-        },
-      });
+        });
+      } catch (err) {
+        console.error('Erro ao carregar Brick ou preferenceId:', err);
+      }
     };
 
-    // Adiciona o script do Mercado Pago no DOM
     document.body.appendChild(script);
 
-    // Limpeza do efeito quando o componente for desmontado
     return () => {
-      const scriptTags = document.querySelectorAll('script[src="https://sdk.mercadopago.com/js/v2"]');
-      scriptTags.forEach((tag) => tag.remove());
+      const scripts = document.querySelectorAll('script[src="https://sdk.mercadopago.com/js/v2"]');
+      scripts.forEach((tag) => tag.remove());
     };
-  }, [orderId, preferenceId, amount]);
+  }, [orderId, router]);
 
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div id="brick_container" className="min-h-[500px]" />
+      {isLoading ? "Carregando pagamento..." : null}
     </div>
   );
 }
