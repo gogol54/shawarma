@@ -41,7 +41,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: data }, { status: 400 });
     }
 
-    console.log('Pagamento processado com sucesso:', data);
     return NextResponse.json({ success: true, data });
   } catch (error) {
     console.error('Erro no servidor:', error);

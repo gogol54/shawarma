@@ -1,7 +1,7 @@
 'use client';
 
-import { useRouter } from 'next/navigation';  // Para redirecionamento
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { toast } from 'sonner';
 
 interface FormData {
@@ -19,13 +19,17 @@ interface OnSubmitArgs {
 
 declare global {
   interface Window {
-    MercadoPago: new (publicKey: string, options: { locale: string }) => {
+    MercadoPago: new (
+      publicKey: string,
+      options: { locale: string }
+    ) => {
       bricks: () => {
         create: (
           type: string,
           containerId: string,
           config: {
-            initialization: { amount: number; preferenceId: string };
+            initialization: {amount:number, preferenceId: string };
+            metadata?: Record<string, any>;
             customization: { paymentMethods: Record<string, string> };
             callbacks: {
               onReady: () => void;
@@ -39,52 +43,48 @@ declare global {
   }
 }
 
-export default function CheckoutPage({ orderId, preferenceId }: { orderId: string, preferenceId: string }) {
-  const [amount, setAmount] = useState<number | null>(null);
-  const router = useRouter();  // Para redirecionamento de página
-  console.log(router)
+export default function CheckoutPage({
+  orderId,
+  preferenceId,
+  amount,
+}: {
+  orderId: string;
+  preferenceId: string;
+  amount: number;
+}) {
+  const router = useRouter()
   useEffect(() => {
-    if (!orderId) return;
-
-    const fetchData = async () => {
-      try {
-        const res = await fetch(`/api/brick-preference?orderId=${orderId}`);
-        const data = await res.json();
-        setAmount(data.amount);
-      } catch (error) {
-        console.error('Erro ao buscar dados da ordem:', error);
-      }
-    };
-
-    fetchData();
-  }, [orderId]);
-
-  useEffect(() => {
-    if (amount === null) return;
-
     const script = document.createElement('script');
     script.src = 'https://sdk.mercadopago.com/js/v2';
     script.async = true;
 
     script.onload = () => {
-      const mp = new window.MercadoPago(process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY!, {
-        locale: 'pt-BR',
-      });
+      // Inicializa o MercadoPago SDK com a chave pública
+      const mp = new window.MercadoPago(
+        process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY!,
+        { locale: 'pt-BR' }
+      );
 
+      // Cria o brick de pagamento
       mp.bricks().create('payment', 'brick_container', {
         initialization: {
-          amount,
-          preferenceId,
+          preferenceId, // ID da preferência do pagamento
+          amount,        // Valor total da ordem (obrigatório)
+        },
+        metadata: {
+          orderId: orderId.toString(), // 
         },
         customization: {
           paymentMethods: {
-            ticket: 'all',
-            bankTransfer: 'all',
-            creditCard: 'all',
+            ticket: 'all',        // Opções de pagamento
+            bankTransfer: 'all',  // Opções de pagamento
+            creditCard: 'all',    // Opções de pagamento
           },
         },
         callbacks: {
-          onReady: () => console.log('Brick iniciado'),
+          onReady: () => {
+            console.log('Brick iniciado');
+          },
           onSubmit: async ({ selectedPaymentMethod, formData }: OnSubmitArgs) => {
             try {
               const res = await fetch('/api/process-payment', {
@@ -127,10 +127,19 @@ export default function CheckoutPage({ orderId, preferenceId }: { orderId: strin
       });
     };
 
+    // Adiciona o script do Mercado Pago no DOM
     document.body.appendChild(script);
-  }, [amount, orderId, preferenceId]);
 
-  if (amount === null) return <div>Carregando pagamento...</div>;
+    // Limpeza do efeito quando o componente for desmontado
+    return () => {
+      const scriptTags = document.querySelectorAll('script[src="https://sdk.mercadopago.com/js/v2"]');
+      scriptTags.forEach((tag) => tag.remove());
+    };
+  }, [orderId, preferenceId, amount]);
 
-  return <div id="brick_container" className="min-h-[500px]" />;
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div id="brick_container" className="min-h-[500px]" />
+    </div>
+  );
 }
