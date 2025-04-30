@@ -1,13 +1,9 @@
-
 import CheckoutPage from '@/components/CheckoutPage';
 import { db } from '@/lib/prisma';
 
-interface CheckoutProps {
-  params: { orderId: string };
-}
-
-export default async function Checkout({ params }: CheckoutProps) {
+export default async function Checkout({ params }: { params: { orderId: string } }) {
   const orderId = params.orderId;
+
   const order = await db.order.findUnique({ 
     where: { 
       id: parseInt(orderId, 10) 
