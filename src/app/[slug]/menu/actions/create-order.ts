@@ -212,8 +212,7 @@ export const createOrder = async (input: CreateOrderInput) => {
       data: { preferenceId: response.id }
     });
 
-    return {
-      orderId: orderResponse.id,
-    };
+    return { redirectUrl: response.init_point };
+
   }
 };

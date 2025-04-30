@@ -98,27 +98,27 @@ const FinishDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
           control: payOnDelivery
         });  
 
-        if (response?.orderId) {
-          clearCart();
-          setIsOpen(false);
-          onOpenChange(false);
-          toast.success("Agradecemos pela preferência!");
-  
-          // Redireciona para o checkout com o preferenceId
-          window.location.href = `/checkout/${response.orderId}`;
-        } else {
-          toast.error("Erro ao iniciar pagamento.");
-        }
-  
-        // if (response?.redirectUrl) {
+        // if (response?.orderId) {
         //   clearCart();
         //   setIsOpen(false);
         //   onOpenChange(false);
         //   toast.success("Agradecemos pela preferência!");
-        //   window.location.href = response.redirectUrl;
+  
+        //   // Redireciona para o checkout com o preferenceId
+        //   window.location.href = `/checkout/${response.orderId}`;
         // } else {
-        //   toast.error("Erro ao redirecionar para o pagamento.");
+        //   toast.error("Erro ao iniciar pagamento.");
         // }
+  
+        if (response?.redirectUrl) {
+          clearCart();
+          setIsOpen(false);
+          onOpenChange(false);
+          toast.success("Agradecemos pela preferência!");
+          window.location.href = response.redirectUrl;
+        } else {
+          toast.error("Erro ao redirecionar para o pagamento.");
+        }
       } catch (error) {
         toast.error("Algum erro foi encontrado, tente novamente!");
         console.log(error);
