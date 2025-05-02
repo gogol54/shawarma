@@ -101,7 +101,11 @@ const handleDownloadReceipt = (order: Order) => {
     `Data/Hora: ${formatDate(order.createdAt)}`,
     `Cliente: ${order.customerName}`,
     `Contato: ${order.customerPhone}`,
-    `Local: ${order.consumptionMethod === "entrega" ? wrapText(address, MAX_LINE_WIDTH) : "Retirada no local"}`,
+    ...(order.consumptionMethod === "entrega"
+      ? wrapText(address, MAX_LINE_WIDTH).map((line, idx) =>
+          idx === 0 ? `Local: ${line}` : `       ${line}`
+        )
+      : ["Local: Retirada no local"]),
     "-".repeat(MAX_LINE_WIDTH),
     `Itens do Pedido:`,
 
