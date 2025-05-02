@@ -124,7 +124,6 @@ export const createOrder = async (input: CreateOrderInput) => {
           consumptionMethod: input.consumptionMethod,
         }),
       });
-      console.log("📨 E-mail de confirmação enviado.");
     } catch (error) {
       console.error("❌ Erro ao enviar e-mail:", error);
     }
@@ -212,7 +211,6 @@ export const createOrder = async (input: CreateOrderInput) => {
       data: { preferenceId: response.id }
     });
 
-    return { redirectUrl: response.init_point };
-
+    return {orderId: orderResponse.id};
   }
 };

@@ -24,7 +24,9 @@ import {
   TableRow
 } from "@/components/ui/table"
 
-import { updateOrderStatus } from "../../actions/orders-actions"
+import { deleteOrder, updateOrderPaid, updateOrderStatus } from "../../actions/orders-actions"
+import { Router, Trash2 } from "lucide-react"
+import { toast } from "sonner"
 
 type OrdersListComponentProps = {
   orders: {
@@ -72,7 +74,7 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
           return "-"
       }
     }
-  
+
     const created = new Date(createdAt)
     const now = new Date()
     const diffMs = now.getTime() - created.getTime()
@@ -97,6 +99,38 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
     }
   }
 
+  function showDeleteConfirmation(onConfirm: () => void) {
+    toast.custom((id: string | number) => (
+      <div className="bg-white border border-gray-300 rounded p-4 shadow-md">
+        <p className="text-sm mb-2">Tem certeza que deseja excluir esse pedido?</p>
+        <div className="flex gap-2 justify-end">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => toast.dismiss(id)} // Passando o id diretamente
+          >
+            Cancelar
+          </Button>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => {
+              toast.dismiss(id)
+              onConfirm()
+            }}
+          >
+            Confirmar
+          </Button>
+        </div>
+      </div>
+    ))
+  }
+  
+  const handlePaidChange = (id: number, isPaid: boolean ) => {
+    updateOrderPaid(id, isPaid)
+    toast.success('Pagamento atualizado!')
+    
+  }
   const handleEditClick = (orderId: number, currentStatus: OrderStatus) => {
     setActiveOrderId(orderId)
     setNewStatus(currentStatus)
@@ -144,7 +178,14 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
                 {getMinutesSince(order.createdAt, order.status)}
               </TableCell>
               <TableCell>
-                {order.isPaid ? "Pago ✅/\nvia "+order.paymentMethod : "Pendente⚠️"}
+                <select
+                  defaultValue={order.isPaid ? "true" : "false"}
+                  onChange={(e) => handlePaidChange(order.id, e.target.value === "true")}
+                  className="bg-transparent border border-gray-300 rounded px-2 py-1 text-sm"
+                >
+                  <option value="true">{order.paymentMethod ? "Pago ✅/\n"+ order.paymentMethod:"Pago ✅"}</option>
+                  <option value="false">Pendente ⚠️</option>
+                </select>
               </TableCell>
               <TableCell>{formatCurrency(order.total)}</TableCell>
               <TableCell>{statusFormatter(order.status)}</TableCell>
@@ -180,7 +221,7 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
-
+                {/*Finda Editar */}
                 {/* Botão Visualizar Produtos */}
                 <Dialog>
                   <DialogTrigger asChild>
@@ -191,7 +232,7 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
 
                   <DialogContent className="max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
-                      <DialogTitle>Produtos do Pedido #{order.id}</DialogTitle>
+                      <DialogTitle>Produtos do Pedido #{order.code}</DialogTitle>
                       <Button
                         variant="outline"
                         onClick={() => handleDownloadReceipt(order)}
@@ -199,41 +240,58 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
                       >
                         Baixar Comprovante
                       </Button>
+
                       {order.orderProducts.length > 0 ? (
-                        order.orderProducts.map((product, index) => (
-                          <div
-                            key={index}
-                            className="border border-gray-200 p-2 rounded shadow-sm"
-                          >
-                            <p className="text-base"><strong>Produto:</strong> {product.product.name}</p>
-                            <p className="text-base"><strong>Quantidade:</strong> {product.quantity}</p>
-                            <p className="text-base"><strong>Preço:</strong> {formatCurrency(product.price)}</p>
-                            {order.consumptionMethod === 'entrega' &&
-                              <p className="text-base"><strong>Entrega:</strong> {formatCurrency(motoboy)}</p>
-                            }
-                            <p className="text-base"><strong>Total:</strong> {
-                              order.consumptionMethod === 'entrega' ? 
-                                formatCurrency(product.price + motoboy) : 
-                                formatCurrency(product.price)}
+                        <>
+                          {order.orderProducts.map((product, index) => (
+                            <div
+                              key={index}
+                              className="border border-gray-200 p-2 rounded shadow-sm mt-2"
+                            >
+                              <p className="text-base"><strong>Produto:</strong> {product.product.name}</p>
+                              <p className="text-base"><strong>Quantidade:</strong> {product.quantity}</p>
+                              <p className="text-base"><strong>Preço:</strong> {formatCurrency(product.price)}</p>
+                              <p className="text-base">
+                                <strong>Ingredientes p/ remover:</strong>{" "}
+                                {Array.isArray(product.dropIng)
+                                  ? product.dropIng.join(", ")
+                                  : "Nenhum"}
+                              </p>
+                            </div>
+                          ))}
+
+                          {/* Total geral após todos os produtos */}
+                          <div className="mt-4 border-t pt-4">
+                            <p className="text-md font-semibold">
+                              Valor: {formatCurrency(order.orderProducts.reduce((acc, product) => acc + product.price, 0))}
                             </p>
-                            <p className="text-base">
-                              <strong>Ingredientes p/ remover:</strong>{" "}
-                              {Array.isArray(product.dropIng)
-                                ? product.dropIng.join(", ")
-                                : "Nenhum"}
+                            {order.consumptionMethod === 'entrega' && (
+                              <p className="text-md font-semibold">
+                                Entrega: {formatCurrency(motoboy)}
+                              </p>
+                            )}
+                            <p className="text-lg font-bold">
+                              Total Final: {
+                                formatCurrency(
+                                  order.orderProducts.reduce((acc, product) => acc + product.price, 0) +
+                                  (order.consumptionMethod === 'entrega' ? motoboy : 0)
+                                )
+                              }
                             </p>
                           </div>
-                        ))
+                        </>
                       ) : (
                         <p className="text-sm text-gray-500">Nenhum produto encontrado.</p>
                       )}
                     </DialogHeader>
-                    {/* ... conteúdo aqui ... */}
                   </DialogContent>
+
                 </Dialog>
-
                 {/* Finda Visualizar Produtos */}
-
+                {/*Init delete order*/}
+                <Button onClick={() => showDeleteConfirmation(() => deleteOrder(order.id))}>
+                  <Trash2 className="w-4 h-4" />
+                </Button>
               </TableCell>
             </TableRow>
           ))}

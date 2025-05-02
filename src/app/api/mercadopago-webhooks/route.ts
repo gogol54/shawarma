@@ -18,7 +18,6 @@ export async function POST(req: NextRequest) {
           Authorization: `Bearer ${process.env.MERCADO_PAGO_ACCESS_TOKEN}`,
         },
       }).then((res) => res.json());
-      console.log("\n\npaymentInfo\n\n", paymentInfo)
       if (paymentInfo.status === "approved") {
         const description = paymentInfo.description || "";
         const preferenceId: string | undefined = description.split("Pedido ")[1]?.trim();

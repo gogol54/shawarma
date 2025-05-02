@@ -17,6 +17,17 @@ interface OnSubmitArgs {
   formData: FormData;
 }
 
+interface CheckoutPageProps {
+  order: {
+    id: number;
+    preferenceId: string;
+    total: number;
+    customerName: string;
+    customerCpf: string;
+    customerPhone: string;
+    // você pode adicionar mais campos se quiser usar depois
+  };
+}
 declare global {
   interface Window {
     MercadoPago: new (
@@ -32,77 +43,6 @@ declare global {
               amount: number;
               preferenceId: string;
               external_reference: string,
-              // external_reference: string,
-              // payer?: {
-              //   name?: string;
-              //   email?: string;
-              //   firstName?: string;
-              //   lastName?: string;
-              //   phone?: {
-              //     area_code?: string;
-              //     number?: string;
-              //   };
-              //   identification?: {
-              //     type?: string;
-              //     number?: string;
-              //   };
-              //   address?: {
-              //     zip_code?: string;
-              //     street_name?: string;
-              //     street_number?: string | number;
-              //     complement?: string;
-              //   };
-              //   date_created?: string;
-              // };
-              // billing?: {
-              //   firstName?: string;
-              //   lastName?: string;
-              //   taxRegime?: string;
-              //   taxIdentificationNumber?: string;
-              //   identification?: {
-              //     type?: string;
-              //     number?: string;
-              //   };
-              //   billingAddress?: {
-              //     streetName?: string;
-              //     streetNumber?: string | number;
-              //     neighborhood?: string;
-              //     city?: string;
-              //     federalUnit?: string;
-              //     zipCode?: string;
-              //   };
-              // };
-              // shipping?: {
-              //   costs?: number;
-              //   shippingMode?: string;
-              //   description?: string;
-              //   receiverAddress?: {
-              //     streetName?: string;
-              //     streetNumber?: string | number;
-              //     neighborhood?: string;
-              //     city?: string;
-              //     federalUnit?: string;
-              //     zipCode?: string;
-              //     additionalInformation?: string;
-              //   };
-              // };
-              // discounts?: {
-              //   totalDiscountsAmount?: number;
-              //   discountsList?: {
-              //     name: string;
-              //     value: number;
-              //   }[];
-              // };
-              // items?: {
-              //   totalItemsAmount?: number;
-              //   itemsList?: {
-              //     units: number;
-              //     value: number;
-              //     name: string;
-              //     description?: string;
-              //     imageURL?: string;
-              //   }[];
-              // };
             };
             customization: {
               paymentMethods: Record<string, string>;
@@ -133,11 +73,15 @@ export default function CheckoutPage({
   orderId: string;
   preferenceId: string;
   amount: number
-}) {
-  const router = useRouter();
+}) {  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
+    const securityScript = document.createElement('script');
+    securityScript.src = 'https://www.mercadopago.com/v2/security.js';
+    securityScript.setAttribute('view', 'checkout');
+    document.body.appendChild(securityScript);
+
     const script = document.createElement('script');
     script.src = 'https://sdk.mercadopago.com/js/v2';
     script.async = true;
@@ -149,7 +93,7 @@ export default function CheckoutPage({
           process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY!,
           { locale: 'pt-BR' }
         );
-
+      
         mp.bricks().create('payment', 'brick_container', {
           initialization: {
             preferenceId,
@@ -166,7 +110,6 @@ export default function CheckoutPage({
           callbacks: {
             onReady: () => {
               setIsLoading(false);
-              console.log('Brick iniciado');
             },
             onSubmit: async ({ selectedPaymentMethod, formData }: OnSubmitArgs) => {
               try {
@@ -177,6 +120,7 @@ export default function CheckoutPage({
                     selectedPaymentMethod,
                     formData,
                     preferenceId,
+                    external_reference: orderId,
                   }),
                 });
 
@@ -208,11 +152,11 @@ export default function CheckoutPage({
             },
           },
         });
+
       } catch (err) {
         console.error('Erro ao carregar Brick ou preferenceId:', err);
       }
     };
-
     document.body.appendChild(script);
 
     return () => {
