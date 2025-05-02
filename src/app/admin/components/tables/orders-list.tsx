@@ -3,6 +3,8 @@
 import { ConsumptionMethod, OrderStatus } from "@prisma/client"
 import { JsonValue } from "@prisma/client/runtime/library"
 import { useState, useTransition } from "react"
+import { Trash2 } from "lucide-react"
+import { toast } from "sonner"
 
 import handleDownloadReceipt from "@/app/helpers/cupom"
 import { formatCurrency } from "@/app/helpers/format-currency"
@@ -13,7 +15,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
 } from "@/components/ui/dialog"
 import {
   Table,
@@ -21,12 +23,14 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow
+  TableRow,
 } from "@/components/ui/table"
 
-import { deleteOrder, updateOrderPaid, updateOrderStatus } from "../../actions/orders-actions"
-import { Trash2 } from "lucide-react"
-import { toast } from "sonner"
+import {
+  deleteOrder,
+  updateOrderPaid,
+  updateOrderStatus,
+} from "../../actions/orders-actions"
 
 type OrdersListComponentProps = {
   orders: {
