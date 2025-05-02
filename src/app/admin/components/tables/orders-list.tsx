@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/table"
 
 import { deleteOrder, updateOrderPaid, updateOrderStatus } from "../../actions/orders-actions"
-import { Router, Trash2 } from "lucide-react"
+import { Trash2 } from "lucide-react"
 import { toast } from "sonner"
 
 type OrdersListComponentProps = {
