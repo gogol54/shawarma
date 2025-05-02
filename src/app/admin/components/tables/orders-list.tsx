@@ -2,8 +2,8 @@
 
 import { ConsumptionMethod, OrderStatus } from "@prisma/client"
 import { JsonValue } from "@prisma/client/runtime/library"
-import { useState, useTransition } from "react"
 import { Trash2 } from "lucide-react"
+import { useState, useTransition } from "react"
 import { toast } from "sonner"
 
 import handleDownloadReceipt from "@/app/helpers/cupom"

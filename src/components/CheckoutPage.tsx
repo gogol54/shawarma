@@ -152,7 +152,7 @@ export default function CheckoutPage({
       const scripts = document.querySelectorAll('script[src="https://sdk.mercadopago.com/js/v2"]');
       scripts.forEach((tag) => tag.remove());
     };
-  }, [orderId, router]);
+  }, [orderId, preferenceId, amount, router]);
 
   return (
     <div className="flex items-center justify-center min-h-screen">
