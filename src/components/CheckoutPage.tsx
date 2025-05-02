@@ -17,17 +17,6 @@ interface OnSubmitArgs {
   formData: FormData;
 }
 
-interface CheckoutPageProps {
-  order: {
-    id: number;
-    preferenceId: string;
-    total: number;
-    customerName: string;
-    customerCpf: string;
-    customerPhone: string;
-    // você pode adicionar mais campos se quiser usar depois
-  };
-}
 declare global {
   interface Window {
     MercadoPago: new (
