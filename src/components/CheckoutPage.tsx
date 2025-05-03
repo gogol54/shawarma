@@ -91,9 +91,9 @@ export default function CheckoutPage({
           },
           customization: {
             paymentMethods: {
-              ticket: 'all',
-              bankTransfer: 'all',
               creditCard: 'all',
+              debitCard: 'all',
+              pix: 'all',
             },
           },
           callbacks: {

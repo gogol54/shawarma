@@ -15,12 +15,6 @@ export async function POST(req: Request) {
       issuer_id: body.formData.issuer_id,
       payer: {
         email: body.formData.payer.email,
-        first_name: body.payer.first_name,
-        last_name: body.payer.last_name,
-        phone: {
-          area_code: body.payer.phone.area, // ou diretamente "55"
-          number: body.payer.phone.number,
-        },        
         identification: {
           type: body.formData.payer.identification.type,
           number: body.formData.payer.identification.number,
