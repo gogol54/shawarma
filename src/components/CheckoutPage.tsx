@@ -57,11 +57,13 @@ declare global {
 export default function CheckoutPage({
   orderId,
   preferenceId,
-  amount
+  amount,
+  phone
 }: {
   orderId: string;
   preferenceId: string;
-  amount: number
+  amount: number;
+  phone: string
 }) {  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   
@@ -123,13 +125,13 @@ export default function CheckoutPage({
 
                 if (data.data.status === 'approved') {
                   toast.success('Pagamento aprovado com sucesso!');
-                  router.push('/checkout?status=success');
+                  router.push(`/checkout?status=success&phone=${phone}`);
                 } else if (data.data.status === 'rejected') {
                   toast.error('Pagamento rejeitado, tente novamente!');
-                  router.push('/checkout?status=failure');
+                  router.push(`/checkout?status=failure&phone=${phone}`);
                 } else {
                   toast.warning('Pagamento pendente ou falhou, tente novamente!');
-                  router.push('/checkout?status=unknown');
+                  router.push(`/checkout?status=unknown&phone=${phone}`);
                 }
               } catch (err) {
                 console.error('Erro ao processar pagamento:', err);

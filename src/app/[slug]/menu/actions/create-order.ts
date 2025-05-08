@@ -143,7 +143,7 @@ export const createOrder = async (input: CreateOrderInput) => {
   
   if(input.control){
     return {
-      redirectUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/${input.slug}/orders?phone=${removePoints(input.customerPhone)}&clean=true`
+      redirectUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/${input.slug}/orders?phone=${removePoints(input.customerPhone)}`
     };
   } else { 
     const preference = new Preference(mercadopago);

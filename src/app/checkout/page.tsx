@@ -6,10 +6,9 @@ import { useEffect, useState } from "react";
 export default function CheckoutRedirect() {
   const searchParams = useSearchParams();
   const router = useRouter();
-
+  const phone = searchParams.get("phone");
   const status = searchParams.get("status") || "unknown";
   const [isLoading, setIsLoading] = useState(false);
-
   const messages = {
     success: {
       title: "Pagamento Aprovado! 🎉",
@@ -42,7 +41,7 @@ export default function CheckoutRedirect() {
 
     // Redireciona para home após 5 segundos
     const timer = setTimeout(() => {
-      router.push("/rosul");
+      router.push(`/rosul/orders?phone=${phone}`)
     }, 5000);
 
     return () => clearTimeout(timer);
@@ -69,7 +68,7 @@ export default function CheckoutRedirect() {
         </>
       )}
       <button
-        onClick={() => router.push("/rosul")}
+        onClick={() => router.push(`/rosul/orders?phone=${phone}`)}
         className="mt-6 px-4 py-2 bg-blue-500 hover:bg-blue-600 transition-colors text-white rounded"
       >
         Voltar para o shawarma

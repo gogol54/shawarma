@@ -14,9 +14,15 @@ export default async function Checkout({ params }: CheckoutProps) {
       } 
     });
 
-    if (!order || !order.preferenceId || order.total == null) {
+    if (!order || !order.preferenceId || order.total == null || !order.customerPhone) {
       // Você pode mostrar um loading, redirecionar ou lançar erro
       return <div>Pedido não encontrado ou incompleto.</div>;
     }
-  return <CheckoutPage orderId={order?.id.toString()} preferenceId={order?.preferenceId} amount={order?.total} />;
+  return( 
+  <CheckoutPage 
+    orderId={order?.id.toString()} 
+    preferenceId={order?.preferenceId} 
+    amount={order?.total} 
+    phone={order?.customerPhone}
+  />);
 }

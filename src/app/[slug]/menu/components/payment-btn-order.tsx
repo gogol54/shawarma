@@ -91,16 +91,23 @@ const FinishDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
           slug: safeSlug,
           control: payOnDelivery
         });  
-
-        if (response?.orderId) {
+        if(response?.orderId) {
+          clearCart();
+          setIsOpen(false);
+          onOpenChange(false);
+          toast.success("Redirecionando para o pagamento...");
+  
+          // Redireciona para o checkout com o preferenceId
+          window.location.href = `/checkout/${response.orderId}`;
+        } 
+         if(response?.redirectUrl) {
           clearCart();
           setIsOpen(false);
           onOpenChange(false);
           toast.success("Agradecemos pela preferência!");
-  
-          // Redireciona para o checkout com o preferenceId
-          window.location.href = `/checkout/${response.orderId}`;
-         } else {
+          window.location.href = response.redirectUrl;
+        }
+         if(!response) {
           toast.error("Erro ao iniciar pagamento.");
         }
   
