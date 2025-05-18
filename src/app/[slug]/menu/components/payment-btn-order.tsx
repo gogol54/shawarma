@@ -66,7 +66,12 @@ const FinishDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
       name: "",
       cpf: "",
       phone: "",
-      address: { street: "", number: "", complement: "", zone: "" },
+      address: { 
+        street: "", 
+        number: "", 
+        complement: "", 
+        zone: "" 
+      },
     },
     shouldUnregister: true,
   });
