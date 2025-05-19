@@ -93,9 +93,8 @@ export default function CheckoutPage({
           },
           customization: {
             paymentMethods: {
-              creditCard: 'all',
-              debitCard: 'all',
-              pix: 'all',
+              bank_transfer: 'all', // habilita Pix
+              credit_card: 'all'   
             },
           },
           callbacks: {
@@ -135,7 +134,7 @@ export default function CheckoutPage({
                 }
               } catch (err) {
                 console.error('Erro ao processar pagamento:', err);
-                alert('Erro ao processar pagamento');
+                router.push(`/checkout?status=unknown&phone=${phone}`);
               }
             },
             onError: (error: Error) => {
@@ -146,6 +145,7 @@ export default function CheckoutPage({
 
       } catch (err) {
         console.error('Erro ao carregar Brick ou preferenceId:', err);
+        router.push(`/checkout?status=unknown&phone=${phone}`);
       }
     };
     document.body.appendChild(script);
