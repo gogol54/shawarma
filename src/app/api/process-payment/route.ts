@@ -2,6 +2,25 @@
 import { NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 
+type PaymentPayload = {
+  transaction_amount: number;
+  payment_method_id: string;
+  description: string;
+  external_reference: string;
+  payer: {
+    email: string;
+    first_name: string;
+    last_name: string;
+    identification: {
+      type: 'CPF' | string;
+      number: string;
+    };
+  };
+  token?: string;
+  installments?: number;
+  issuer_id?: string;
+};
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -11,7 +30,7 @@ export async function POST(req: Request) {
     console.log(body)
     const isPix = paymentMethod === 'pix';
 
-    const paymentPayload: any = {
+    const paymentPayload: PaymentPayload = {
       transaction_amount: body.formData.transaction_amount,
       payment_method_id: paymentMethod,
       description: `Pedido ${body.preferenceId}`,
