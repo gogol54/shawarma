@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { db } from "@/lib/prisma";
-
-import { sendOrderUpdateEmail } from "../admin/route";
+import { sendOrderUpdateEmail } from "@/lib/utils";
 
 export async function POST(req: NextRequest) {
   const { searchParams } = new URL(req.url);
