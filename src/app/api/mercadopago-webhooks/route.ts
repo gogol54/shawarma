@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { db } from "@/lib/prisma";
+
 import { sendOrderUpdateEmail } from "../admin/route";
 
 export async function POST(req: NextRequest) {
