@@ -1,7 +1,8 @@
 // src/app/api/webhooks/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/prisma";
 import nodemailer from "nodemailer";
+
+import { db } from "@/lib/prisma";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",

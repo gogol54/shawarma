@@ -50,7 +50,7 @@ export default function CheckoutRedirect() {
     }, 5000);
 
     return () => clearTimeout(timer);
-  }, [status, router]);
+  }, [status, router, phone]);
 
   const statusMessage = messages[status as keyof typeof messages];
 
