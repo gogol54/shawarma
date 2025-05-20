@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
           await db.order.update({
             where: { id: order.id },
             data: {
-              status: "IN_PREPARATION",
+              status: "APPROVED",
               isPaid: true,
               paymentMethod,
             },

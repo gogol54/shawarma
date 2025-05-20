@@ -74,8 +74,17 @@ model Order {
   updatedAt         DateTime          @updatedAt
 }
 
+model OpeningHours {
+  id                Int               @id @default(autoincrement())
+  dayOfWeek         Int      // 0 (Domingo) até 6 (Sábado)
+  openTime          String   // Ex: "20:00"
+  closeTime         String   // Ex: "23:00"
+  isOpen            Boolean  // true = aberto nesse dia
+}
+
 enum OrderStatus {
   PENDING
+  APPROVED
   IN_PREPARATION
   DELIVERY
   FINISHED

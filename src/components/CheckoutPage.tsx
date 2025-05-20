@@ -60,7 +60,8 @@ export default function CheckoutPage({
   amount,
   phone,
   customerCpf,
-  customerName
+  customerName,
+  code
 }: {
   orderId: string;
   preferenceId: string;
@@ -68,6 +69,7 @@ export default function CheckoutPage({
   phone: string;
   customerName: string;
   customerCpf: string;
+  code: string;
 }) {  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   
@@ -139,21 +141,21 @@ export default function CheckoutPage({
 
                 if (data.data.status === 'approved') {
                   toast.success('Pagamento aprovado com sucesso!');
-                  router.push(`/checkout?status=success&phone=${phone}`);
+                  router.push(`/checkout?status=success&phone=${phone}&code=${code}`);
                 } else if (data.data.status === 'rejected') {
                   toast.error('Pagamento rejeitado, tente novamente!');
-                  router.push(`/checkout?status=failure&phone=${phone}`);
+                  router.push(`/checkout?status=failure&phone=${phone}&code=${code}`);
                 } else if(data.data.status === 'pending'){
                   toast.warning('Pagamento pendente...Verifique seu Email!');
-                  router.push(`/checkout?status=pending&phone=${phone}`);
+                  router.push(`/checkout?status=pending&phone=${phone}&code=${code}`);
                 }
                 else{
                   toast.warning('Pagamento pendente ou falhou...Entre em contato conosco!');
-                  router.push(`/checkout?status=unknown&phone=${phone}`);
+                  router.push(`/checkout?status=unknown&phone=${phone}&code=${code}`);
                 }
               } catch (err) {
                 console.error('Erro ao processar pagamento:', err);
-                router.push(`/checkout?status=unknown&phone=${phone}`);
+                router.push(`/checkout?status=unknown&phone=${phone}&code=${code}`);
               }
             },
             onError: (error: Error) => {
@@ -180,7 +182,8 @@ export default function CheckoutPage({
       router,
       customerCpf,
       customerName,
-      phone
+      phone,
+      code
     ]);
 
   return (

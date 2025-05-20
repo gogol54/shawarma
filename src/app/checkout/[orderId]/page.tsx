@@ -14,7 +14,15 @@ export default async function Checkout({ params }: CheckoutProps) {
       } 
     });
 
-    if (!order || !order.preferenceId || order.total == null || !order.customerPhone || !order.customerCpf || !order.customerName) {
+    if (
+      !order || 
+      !order.preferenceId || 
+      order.total == null || 
+      !order.customerPhone || 
+      !order.customerCpf || 
+      !order.customerName ||
+      !order.code
+    ) {
       // Você pode mostrar um loading, redirecionar ou lançar erro
       return <div>Pedido não encontrado ou incompleto.</div>;
     }
@@ -26,5 +34,6 @@ export default async function Checkout({ params }: CheckoutProps) {
     phone={order?.customerPhone}
     customerName={order?.customerName}
     customerCpf={order?.customerCpf}
+    code={order?.code}
   />);
 }

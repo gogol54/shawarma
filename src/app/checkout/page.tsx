@@ -3,12 +3,17 @@
 import { useRouter,useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { TrackPaymentButton } from "../[slug]/orders/components/back-btn";
+
 export default function CheckoutRedirect() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const phone = searchParams.get("phone");
-  const status = searchParams.get("status") || "unknown";
+  const code = searchParams.get("code");
+  const status = (searchParams.get("status") || "unknown").toLowerCase();
+  const [statusResponse, setStatus] = useState(status);
   const [isLoading, setIsLoading] = useState(false);
+  console.log(code)
   const messages = {
     success: {
       title: "Pagamento Aprovado! 🎉",
@@ -25,7 +30,7 @@ export default function CheckoutRedirect() {
       description: (
         <>
           Seu pagamento está sendo processado. Verificando automaticamente...<br />
-          Após efetuar o pagamento enviar o comprovante no WhatsApp do Shawarma Rosul!
+          Após efetuar o pagamento, envie o comprovante no WhatsApp Shawarma Rosul!
         </>
       ),
       color: "text-yellow-600",
@@ -38,21 +43,43 @@ export default function CheckoutRedirect() {
   };
 
   useEffect(() => {
-    // Caso seja pending, pode aguardar ou fazer polling se quiser
-    if (status === "pending") {
-      setIsLoading(true);
-      return;
+    if (!code) return;
+    setIsLoading(true)
+    if (statusResponse === "pending" || statusResponse === "PENDING") {
+      setIsLoading(true); // Liga logo o spinner
+
+      const interval = setInterval(async () => {
+        try {
+          const res = await fetch("/api/order-status-check", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code }),
+          });
+
+          const data = await res.json();
+          if (data.status && data.status.toLowerCase() === "approved") {
+            setStatus("success");
+            clearInterval(interval);
+            setIsLoading(false);
+          }
+        } catch (err) {
+          console.error("Erro ao consultar status do pedido:", err);
+        }
+      }, 3000);
+
+      return () => clearInterval(interval);
+    } else {
+      setIsLoading(false); // Garante spinner desligado pra outros status
+
+      const timeout = setTimeout(() => {
+        router.push(`/rosul/orders?phone=${phone}`);
+      }, 3000);
+
+      return () => clearTimeout(timeout);
     }
+  }, [statusResponse, code, router, phone]);
 
-    // Redireciona para home após 5 segundos
-    const timer = setTimeout(() => {
-      router.push(`/rosul/orders?phone=${phone}`)
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, [status, router, phone]);
-
-  const statusMessage = messages[status as keyof typeof messages];
+  const statusMessage = messages[statusResponse as keyof typeof messages];
 
   return (
     <div className="flex flex-col items-center justify-center h-screen text-center px-4">
@@ -67,17 +94,22 @@ export default function CheckoutRedirect() {
             <div className="mt-4 animate-spin h-6 w-6 border-4 border-yellow-500 border-t-transparent rounded-full"></div>
           )}
 
-          {status !== "pending" && (
+          {(statusResponse !== "pending") && (
             <p className="mt-4 text-sm text-gray-500">Redirecionando para o shawarma...</p>
           )}
         </>
       )}
-      <button
-        onClick={() => router.push(`/rosul/orders?phone=${phone}`)}
-        className="mt-6 px-4 py-2 bg-blue-500 hover:bg-blue-600 transition-colors text-white rounded"
-      >
-        Voltar para o shawarma
-      </button>
+      {
+        statusResponse === "pending" 
+          ? <TrackPaymentButton orderId={code} />
+          :
+            <button
+              onClick={() => router.push(`/rosul/orders?phone=${phone}`)}
+              className="mt-6 px-4 py-2 bg-blue-500 hover:bg-blue-600 transition-colors text-white rounded"
+            >
+              Voltar para o shawarma
+            </button>
+      }
     </div>
   );
 }

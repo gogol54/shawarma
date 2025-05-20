@@ -51,3 +51,25 @@ export const TrackOrderButton = ({ orderId }: TrackOrderButtonProps) => {
     </Button>
   )
 }
+
+export const TrackPaymentButton = ({ orderId }: TrackOrderButtonProps) => {
+  const handleClick = () => {
+    const whatsappNumber = "+55" + "55996838707"
+    const message = `Olá, estou acompanhando o pedido #${orderId}`
+    const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
+    
+    window.open(whatsappURL, "_blank")
+  }
+
+  return (
+    <Button onClick={handleClick} className=" mt-4 justify-between text-slate-200 bg-neutral-600 hover:bg-neutral-700">
+      Acompanhe seu pedido 
+      <Image 
+        src="/wpp.png"
+        alt="whatsapp logo"
+        width={30}
+        height={30}
+      />
+    </Button>
+  )
+}
