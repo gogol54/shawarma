@@ -5,6 +5,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { verifyToken } from '../../actions/verify-token'
 import { AppSidebar } from '../../components/sidebar-admin'
 import DashboardPage from '../../pages/dashboard'
+import OpeningHoursForm from '../../pages/date-is-open'
 import OrdersList from '../../pages/orders-list'
 import CreateProducts from '../../pages/products-create'
 import ProductsList from '../../pages/products-list'
@@ -18,6 +19,8 @@ const getComponent = (route?: string) => {
   switch (route) {
     case 'pedidos':
       return <OrdersList />
+    case 'horario': 
+      return <OpeningHoursForm />
     case 'produtos':
       return <ProductsList />
     case 'cadastrar':

@@ -25,6 +25,11 @@ export function AppSidebar({ token }: { token: string }) {
       url: getPanelRoute(token, 'dashboard'),
       icon: Home,
     },
+    {
+      title: "Horário de Funcionamento",
+      url: getPanelRoute(token, 'horario'),
+      icon: Home,
+    },
   ];
 
   const group_02 = [

@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
 
 import { formatCurrency } from "@/app/helpers/format-currency";
-import { isOpenRestaurant } from "@/app/helpers/is-open";
+import { fetchIsRestaurantOpen } from "@/app/helpers/is-open";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
@@ -27,7 +27,7 @@ interface RestaurantCategoriesProps {
 
 const RestaurantCategories = ({ restaurant }: RestaurantCategoriesProps) => {
   const { products, total, totalQuantity, setIsOpen } = useContext(CartContext);
-
+  const [open, setOpenRestaurant] = useState<boolean |null>(null)
   const [selectedCategory, setSelectedCategory] = useState<typeof restaurant.menuCategories[0] | null>(null);
 
   useEffect(() => {
@@ -48,12 +48,20 @@ const RestaurantCategories = ({ restaurant }: RestaurantCategoriesProps) => {
     }
   }, [restaurant.menuCategories]);
 
+
+  useEffect(() => {
+  const checkOpen = async () => {
+    const isOpen = await fetchIsRestaurantOpen(); // ou slug, depende da função
+    setOpenRestaurant(isOpen);
+  };
+
+  checkOpen();
+}, [restaurant.id]);
+
   const handleCategoryClick = (category: typeof restaurant.menuCategories[0]) => {
     setSelectedCategory(category);
     localStorage.setItem("selectedCategory", category.name);
   }
-
-  const open = isOpenRestaurant();
 
   const getCategoryBtn = (category: string) => {
     return selectedCategory?.name === category ? "default" : "secondary";
@@ -81,7 +89,7 @@ const RestaurantCategories = ({ restaurant }: RestaurantCategoriesProps) => {
             <>
               <div className="flex flex-row items-center">
                 <ClockIcon size={12} className="mt-1 mr-1 text-green-500" />
-                <p className="font-semibold text-green-500 mt-1 text-[14px]">Aberto até às 23:00!</p>
+                <p className="font-semibold text-green-500 mt-1 text-[14px]">Aberto!</p>
               </div>
               <div>
                 <p>

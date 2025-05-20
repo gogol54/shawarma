@@ -3,9 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useContext, useState } from "react";
 
-// import { toast } from "sonner";
 import { formatCurrency } from "@/app/helpers/format-currency";
-// import { isOpenRestaurantMerged } from "@/app/helpers/is-open";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox"
