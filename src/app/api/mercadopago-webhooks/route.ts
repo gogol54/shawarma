@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { db } from "@/lib/prisma";
+import { sendOrderUpdateEmail } from "../admin/route";
 
 export async function POST(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -42,8 +43,7 @@ export async function POST(req: NextRequest) {
               paymentMethod,
             },
           });
-      
-          console.log(`📦 Pedido ${order.id} atualizado com status IN_PREPARATION e método ${paymentMethod}`);
+          sendOrderUpdateEmail(order.id, paymentMethod);
         } else {
           console.log("⚠️ Nenhum pedido encontrado com esse preferenceId.");
         }
