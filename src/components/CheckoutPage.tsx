@@ -58,12 +58,16 @@ export default function CheckoutPage({
   orderId,
   preferenceId,
   amount,
-  phone
+  phone,
+  customerCpf,
+  customerName
 }: {
   orderId: string;
   preferenceId: string;
   amount: number;
-  phone: string
+  phone: string;
+  customerName: string;
+  customerCpf: string;
 }) {  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   
@@ -94,7 +98,8 @@ export default function CheckoutPage({
           customization: {
             paymentMethods: {
               bank_transfer: 'all', // habilita Pix
-              credit_card: 'all'   
+              debit_card: 'all',
+              credit_card: 'all'
             },
           },
           callbacks: {
@@ -102,6 +107,14 @@ export default function CheckoutPage({
               setIsLoading(false);
             },
             onSubmit: async ({ selectedPaymentMethod, formData }: OnSubmitArgs) => {
+              console.log('Payload enviado:', {
+                selectedPaymentMethod,
+                formData,
+                preferenceId,
+                external_reference: orderId,
+                customerName,
+                customerCpf,
+              });
               try {
                 const res = await fetch('/api/process-payment', {
                   method: 'POST',
@@ -111,6 +124,8 @@ export default function CheckoutPage({
                     formData,
                     preferenceId,
                     external_reference: orderId,
+                    customerName,
+                    customerCpf
                   }),
                 });
 
@@ -128,8 +143,12 @@ export default function CheckoutPage({
                 } else if (data.data.status === 'rejected') {
                   toast.error('Pagamento rejeitado, tente novamente!');
                   router.push(`/checkout?status=failure&phone=${phone}`);
-                } else {
-                  toast.warning('Pagamento pendente ou falhou, tente novamente!');
+                } else if(data.data.status === 'pending'){
+                  toast.warning('Pagamento pendente...Verifique seu Email!');
+                  router.push(`/checkout?status=pending&phone=${phone}`);
+                }
+                else{
+                  toast.warning('Pagamento pendente ou falhou...Entre em contato conosco!');
                   router.push(`/checkout?status=unknown&phone=${phone}`);
                 }
               } catch (err) {

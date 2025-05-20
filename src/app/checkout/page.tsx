@@ -22,7 +22,12 @@ export default function CheckoutRedirect() {
     },
     pending: {
       title: "Pagamento Pendente ⏳",
-      description: "Seu pagamento está sendo processado. Verificando automaticamente...",
+      description: (
+        <>
+          Seu pagamento está sendo processado. Verificando automaticamente...<br />
+          Após efetuar o pagamento enviar o comprovante no WhatsApp do Shawarma Rosul!
+        </>
+      ),
       color: "text-yellow-600",
     },
     unknown: {

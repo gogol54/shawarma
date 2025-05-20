@@ -1,33 +1,45 @@
 // app/api/process-payment/route.ts
-
 import { NextResponse } from 'next/server';
-import {v4 as uuidv4 } from 'uuid'
+import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const paymentPayload = {
+    console.log('Body recebido no servidor:', JSON.stringify(body, null, 2));
+    const paymentMethod = body.formData.payment_method_id;
+    console.log(paymentMethod)
+    console.log(body)
+    const isPix = paymentMethod === 'pix';
+
+    const paymentPayload: any = {
       transaction_amount: body.formData.transaction_amount,
-      token: body.formData.token,
+      payment_method_id: paymentMethod,
       description: `Pedido ${body.preferenceId}`,
-      installments: body.formData.installments,
-      payment_method_id: body.formData.payment_method_id,
-      issuer_id: body.formData.issuer_id,
+      external_reference: body.external_reference,
       payer: {
         email: body.formData.payer.email,
+        first_name: body.customerName,
+        last_name: 'Bolonha',
         identification: {
-          type: body.formData.payer.identification.type,
-          number: body.formData.payer.identification.number,
+          type:'CPF',
+          number: body.customerCpf,
         },
       },
-      external_reference: body.external_reference
     };
+  
+    if (!isPix) {
+      // Adiciona apenas para cartão
+      paymentPayload.token = body.formData.token;
+      paymentPayload.installments = body.formData.installments;
+      paymentPayload.issuer_id = body.formData.issuer_id;
+    }
+   
     const response = await fetch('https://api.mercadopago.com/v1/payments', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${process.env.MERCADO_PAGO_ACCESS_TOKEN}`,
-        'X-Idempotency-Key': uuidv4(), // ✅ Header obrigatório
+        'X-Idempotency-Key': uuidv4(),
       },
       body: JSON.stringify(paymentPayload),
     });
