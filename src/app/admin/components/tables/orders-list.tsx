@@ -212,6 +212,7 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
                       onChange={(e) => setNewStatus(e.target.value as OrderStatus)}
                       className="border rounded p-2 w-full mt-4"
                     >
+                      <option value="APPROVED">Pagamento Aprovado</option>
                       <option value="PENDING">Pendente</option>
                       <option value="IN_PREPARATION">Em preparo</option>
                       <option value="DELIVERY">Saiu para entrega</option>

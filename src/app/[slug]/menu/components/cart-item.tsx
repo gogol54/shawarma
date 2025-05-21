@@ -33,7 +33,7 @@ const CartItem = ({item} : CartItemProps) => {
         </div>
         <div className="space-y-1">
           <p className="text-xs max-w-[90%] truncate text-ellipsis">{item.name}</p>
-          <p className="text-sm font-semibold">{formatCurrency(item.price)}</p>
+          <p className="text-sm font-semibold">{formatCurrency(item.price * (1 - item.offer / 100))}</p>
           {/* QUANTIDADE */}
           <div className="flex items-center gap-1 text-center">
             <Button 

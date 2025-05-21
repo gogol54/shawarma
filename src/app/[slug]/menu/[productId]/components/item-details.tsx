@@ -84,7 +84,7 @@ const ProductDetails = ({product}: ProductDetailsProps) => {
           {/* PREÇO E QUANTIDADE */}
           <div className="flex items-center mt-3 justify-between">
             <h3 className="text-xl semibold">
-              {formatCurrency(product.price)}
+              {formatCurrency(product.price * (1 - product.offer / 100))}
             </h3>
             <div className="flex items-center gap-3 text-center">
               <Button 

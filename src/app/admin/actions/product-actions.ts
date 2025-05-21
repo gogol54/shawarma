@@ -9,6 +9,7 @@ type UpdatableProductFields = {
   name?: string
   description?: string
   price?: number
+  offer?: number
   inStock?: number
   imageUrl?: string
   menuCategoryId?: string
@@ -53,6 +54,7 @@ export async function createProduct(data: {
   name: string
   description: string
   price: number
+  offer: number | 0
   inStock?: number
   imageUrl: string
   menuCategoryId: string

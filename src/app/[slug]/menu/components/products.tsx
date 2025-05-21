@@ -27,16 +27,32 @@ const Products = ({products}: ProductsProps) => {
               <p className="line-clamp-2 text-sm text-muted-foreground">
                 {product.description}
               </p>
-              <p className="pt-3 text-sm font-semibold">
-                {
-                  new Intl.NumberFormat("pt-BR",
-                    {
+              {product.offer > 0 ? (
+                <div className="pt-3">
+                  <p className="text-xs text-muted-foreground line-through">
+                    {new Intl.NumberFormat("pt-BR", {
                       style: "currency",
-                      currency: "BRL"
-                    }
-                  ).format(product.price)
-                }
-              </p>
+                      currency: "BRL",
+                    }).format(product.price)}
+                  </p>
+                  <p className="text-sm font-semibold text-green-600">
+                    {new Intl.NumberFormat("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    }).format(product.price * (1 - product.offer / 100))}
+                    <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded">
+                      {product.offer}% OFF
+                    </span>
+                  </p>
+                </div>
+              ) : (
+                <p className="pt-3 text-sm font-semibold">
+                  {new Intl.NumberFormat("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  }).format(product.price)}
+                </p>
+              )}
             </div>
             <div className="relative min-h-[82px] min-w-[120px] ">
               <Image

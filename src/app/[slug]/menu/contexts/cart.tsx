@@ -3,7 +3,7 @@
 import { Product } from "@prisma/client";
 import { createContext, ReactNode, useState } from "react";
 
-export interface CartProduct extends Pick<Product, "id" | "name" | "description" | "imageUrl" | "price" | "inStock" | "menuCategoryId" >{
+export interface CartProduct extends Pick<Product, "id" | "name" | "description" | "imageUrl" | "price" | "offer" | "inStock" | "menuCategoryId" >{
   quantity: number;
   dropIng: string[];
 }
@@ -44,7 +44,7 @@ export const CartProvider = ({children} : {children: ReactNode}) => {
   const [payOnDelivery, setPayOnDelivery] = useState<boolean>(false);
 
   const total = products.reduce((acc, product) => {
-    return acc + product.price * product.quantity;
+    return acc + (product.price * (1 - product.offer / 100)) * product.quantity;
   },0)
   const totalQuantity = products.reduce((acc, product) => {
     return acc + product.quantity 

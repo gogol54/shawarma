@@ -47,6 +47,7 @@ model Product {
   name           String
   description    String
   price          Float
+  offer          Float         @default(0)
   inStock        Int           @default(25)
   imageUrl       String
   ingredients    Json          

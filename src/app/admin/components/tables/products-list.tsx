@@ -30,6 +30,7 @@ type Product = {
   name: string
   description: string
   price: number
+  offer: number
   inStock: number
   imageUrl: string
   createdAt: string
@@ -51,6 +52,7 @@ const ProductsListComponent = ({ products }: Props) => {
     name: "",
     description: "",
     price: "",
+    offer: "",
     inStock: "",
     imageUrl: "",
   })
@@ -61,6 +63,7 @@ const ProductsListComponent = ({ products }: Props) => {
       name: product.name,
       description: product.description,
       price: String(product.price),
+      offer: String(product.offer ?? 0), // ← aqui
       inStock: String(product.inStock),
       imageUrl: product.imageUrl,
     })
@@ -74,6 +77,7 @@ const ProductsListComponent = ({ products }: Props) => {
       name: form.name,
       description: form.description,
       price: parseFloat(form.price),
+      offer: parseFloat(form.offer),
       inStock: parseInt(form.inStock),
       imageUrl: form.imageUrl,
     })
@@ -132,7 +136,9 @@ const ProductsListComponent = ({ products }: Props) => {
                   })}
                 </TableCell>
                 <TableCell className="p-2 space-y-2">
-                  {/* Dialog Atualizar */}
+                
+                
+                {/* Dialog Atualizar */}
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button
@@ -179,6 +185,19 @@ const ProductsListComponent = ({ products }: Props) => {
                             />
                           </div>
                           <div>
+                            <Label>Desconto (%)</Label>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              max="100"
+                              value={form.offer}
+                                onChange={(e) =>
+                                setForm((prev) => ({ ...prev, offer: e.target.value }))
+                              }
+                            />
+                          </div>
+                          <div>
                             <Label>Estoque</Label>
                             <Input
                               type="number"
@@ -207,6 +226,8 @@ const ProductsListComponent = ({ products }: Props) => {
                       )}
                     </DialogContent>
                   </Dialog>
+
+
 
                   {/* Dialog Remoção */}
                   <Dialog>
