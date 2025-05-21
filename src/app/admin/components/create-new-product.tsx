@@ -65,6 +65,7 @@ export default function CreateProductComponent({ restaurants, menuCategories }: 
   const onSubmit = async (data: FormSchema) => {
     const result = await createProduct({
       ...data,
+      offer: 0,
       price: Number(data.price),
       ingredients: data.ingredients?.map(i => i.value) ?? [],
     })
