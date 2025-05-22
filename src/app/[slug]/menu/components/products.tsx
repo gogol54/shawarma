@@ -13,20 +13,29 @@ const Products = ({products}: ProductsProps) => {
   const consumptionMethod = search.get("consumptionMethod")
   return (  
     <div className="space-y-3 px-5 pb-20">
-      {
-        products.map((product) => (
-          <Link 
-            key={product.id} 
-            href={`/${slug}/menu/${product.id}?consumptionMethod=${consumptionMethod}`} 
-            className="flex items-center justify-between gap-10 py-3 border-b"
-          > 
+      {products.map((product) => {
+        const isAvailable = product.inStock > 0;
+
+        return (
+          <Link
+            key={product.id}
+            href={`/${slug}/menu/${product.id}?consumptionMethod=${consumptionMethod}`}
+            className={`flex items-center justify-between gap-10 py-3 border-b transition ${
+              !isAvailable ? "opacity-70" : ""
+            }`}
+          >
             <div>
-              <h3 className="text-sm font-medium">
-                {product.name}
-              </h3>
+              <h3 className="text-sm font-medium">{product.name}</h3>
               <p className="line-clamp-2 text-sm text-muted-foreground">
                 {product.description}
               </p>
+
+              {!isAvailable && (
+                <span className="inline-block mt-1 text-xs font-semibold text-red-600 bg-red-100 px-2 py-0.5 rounded">
+                  Indisponível
+                </span>
+              )}
+
               {product.offer > 0 ? (
                 <div className="pt-3">
                   <p className="text-xs text-muted-foreground line-through">
@@ -54,7 +63,8 @@ const Products = ({products}: ProductsProps) => {
                 </p>
               )}
             </div>
-            <div className="relative min-h-[82px] min-w-[120px] ">
+
+            <div className="relative min-h-[82px] min-w-[120px]">
               <Image
                 src={product.imageUrl}
                 alt={product.name}
@@ -63,8 +73,8 @@ const Products = ({products}: ProductsProps) => {
               />
             </div>
           </Link>
-        ))
-      }
+        );
+      })}
     </div>
   )
 }

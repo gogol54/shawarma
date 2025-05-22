@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
 
 async function sendOrderUpdateEmail(orderId: number, paymentMethod: string) {
   const subject = `📦 Pedido ${orderId} foi PAGO`;
-  const message = `📦 Pedido ${orderId} atualizado para EM PREPARO e método ${paymentMethod}`;
+  const message = `📦 Pedido ${orderId} atualizado para PAGAMENTO APROVADO com método ${paymentMethod}`;
 
   try {
     await transporter.sendMail({

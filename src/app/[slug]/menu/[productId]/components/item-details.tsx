@@ -144,7 +144,15 @@ const ProductDetails = ({product}: ProductDetailsProps) => {
          
           </div>
         </div>
-        <Button className="mt-6 w-full rounded-full" onClick={handleAddToCart}>Adicionar à sacola</Button>
+        {product.inStock > 0 ? (
+          <Button className="mt-6 w-full rounded-full" onClick={handleAddToCart}>
+            Adicionar à sacola
+          </Button>
+        ) : (
+          <Button disabled className="mt-6 w-full rounded-full opacity-60 cursor-not-allowed">
+            Produto indisponível no momento
+          </Button>
+        )}
       </div>
       <CartSheet />
     </>
