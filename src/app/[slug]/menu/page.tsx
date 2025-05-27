@@ -27,7 +27,13 @@ const RestaurantMenuPage = async ({params, searchParams}: RestaurantMenuProps) =
       },
     }
   })
-  const randomData = restaurant?.menuCategories
+const openWeek = await db.openingHours.findMany({
+  orderBy: {
+    dayOfWeek: 'asc',
+  },
+});  
+
+const randomData = restaurant?.menuCategories
   const ordem = ['salgados','doces','combos', 'fritas', 'bebidas' ]; // você pode incluir mais categorias aqui
   randomData?.sort((a, b) => {
     const indexA = ordem.indexOf(a.name.toLowerCase());
@@ -43,7 +49,7 @@ const RestaurantMenuPage = async ({params, searchParams}: RestaurantMenuProps) =
   return (
     <div>
       <RestaurantHeader restaurant={restaurant} slug={slug} />      
-      <RestaurantCategories restaurant={restaurant} />
+      <RestaurantCategories restaurant={restaurant} openWeek={openWeek} />
     </div>
   )
 }

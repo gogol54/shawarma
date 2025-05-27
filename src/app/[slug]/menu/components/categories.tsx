@@ -9,6 +9,13 @@ import { useContext, useEffect, useState } from "react";
 import { formatCurrency } from "@/app/helpers/format-currency";
 import { fetchIsRestaurantOpen } from "@/app/helpers/is-open";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 import { CartContext } from "../contexts/cart";
@@ -23,13 +30,27 @@ interface RestaurantCategoriesProps {
       },
     },
   }>
+  openWeek: Prisma.OpeningHoursGetPayload<true>[]
 }
 
-const RestaurantCategories = ({ restaurant }: RestaurantCategoriesProps) => {
+
+const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProps) => {
   const { products, total, totalQuantity, setIsOpen } = useContext(CartContext);
   const [open, setOpenRestaurant] = useState<boolean |null>(null)
+  const [openDialog, setOpenDialog] = useState<boolean | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<typeof restaurant.menuCategories[0] | null>(null);
-
+  const handleClickTimeStamp = () => {
+    setOpenDialog(true)
+  }
+  const daysOfWeek = [
+    { label: "Domingo", limited: false },
+    { label: "Segunda-feira", limited: true },
+    { label: "Terça-feira", limited: true },
+    { label: "Quarta-feira", limited: true },
+    { label: "Quinta-feira", limited: false },
+    { label: "Sexta-feira", limited: false },
+    { label: "Sábado", limited: false },
+  ];
   useEffect(() => {
     const savedCategoryName = localStorage.getItem("selectedCategory");
 
@@ -79,11 +100,72 @@ const RestaurantCategories = ({ restaurant }: RestaurantCategoriesProps) => {
             quality={100}
             className="object-cover rounded-lg"
           />
+   
           <div>
             <h2 className="text-lg font-semibold">{restaurant.name}</h2>
             <p className="text-xs opacity-55">{restaurant.description}</p>
           </div>
         </div>
+        <div className="flex justify-end">
+          <Button 
+            className="bg-[#f5f5f5] text-[#333333] hover:bg-gray-200 mt-2 mb-2"
+            onClick={() => handleClickTimeStamp()}
+          >
+            <p>Horário da Semana</p>
+          </Button>
+        </div>
+        <Dialog open={openDialog === true && Array.isArray(openWeek)} onOpenChange={() => setOpenDialog(!openDialog)}>
+          <DialogTrigger asChild>
+  
+          </DialogTrigger>
+          <DialogContent className="max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Horários de Funcionamento</DialogTitle>
+            </DialogHeader>
+
+            <div className="mt-4 space-y-3">
+              {openWeek.map((day) => {
+                <p className="font-medium flex items-center gap-2">
+                  {daysOfWeek[day.dayOfWeek].label}
+                  {daysOfWeek[day.dayOfWeek].limited && (
+                    <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full">
+                      Encomendas limitadas
+                    </span>
+                  )}
+                </p>
+                return (
+                  <div
+                    key={day.id}
+                    className={`flex items-center justify-between rounded-xl border px-4 py-3 ${
+                      day.isOpen ? "bg-green-50" : "bg-red-50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      {day.isOpen ? (
+                        <ClockIcon className="text-green-600" size={20} />
+                      ) : (
+                        <LockIcon className="text-red-600" size={20} />
+                      )}
+                      <p className="font-medium">{daysOfWeek[day.dayOfWeek].label}</p>
+
+                      {daysOfWeek[day.dayOfWeek].limited && (
+                        <span className="text-xs text-center bg-yellow-100 mr-2 text-yellow-800 px-2 py-0.5 rounded-full">
+                          Encomendas limitadas
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="text-sm font-semibold text-muted-foreground">
+                      {day.isOpen ? `${day.openTime} às ${day.closeTime}` : "Fechado"}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </DialogContent>
+
+        </Dialog>
+
         <div className="flex flex-row justify-between text-xs mt-3 items-center">
           {open ? (
             <>
