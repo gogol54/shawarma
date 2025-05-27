@@ -106,12 +106,12 @@ const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProp
             <p className="text-xs opacity-55">{restaurant.description}</p>
           </div>
         </div>
-        <div className="flex justify-end">
+        <div className="flex justify-start hma">
           <Button 
-            className="bg-[#f5f5f5] text-[#333333] hover:bg-gray-200 mt-2 mb-2"
+            className="bg-[#f5f5f5] text-[#333333] hover:bg-gray-200 mt-4 mb-2 w-32 max-h-8"
             onClick={() => handleClickTimeStamp()}
           >
-            <p>Horário da Semana</p>
+            <p className="text-xs">Horário da Semana</p>
           </Button>
         </div>
         <Dialog open={openDialog === true && Array.isArray(openWeek)} onOpenChange={() => setOpenDialog(!openDialog)}>
