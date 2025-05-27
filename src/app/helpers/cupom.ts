@@ -49,24 +49,6 @@ const handleDownloadReceipt = (order: Order) => {
     }
   }
 
-  const wrapText = (text: string, maxLength: number): string[] => {
-    const words = text.split(" ");
-    const lines: string[] = [];
-    let currentLine = "";
-  
-    words.forEach((word) => {
-      if ((currentLine + word).length <= maxLength) {
-        currentLine += (currentLine ? " " : "") + word;
-      } else {
-        lines.push(currentLine);
-        currentLine = word;
-      }
-    });
-  
-    if (currentLine) lines.push(currentLine);
-    return lines;
-  };
-
   const formatDate = (dateStr: string | Date) => {
     const date = new Date(dateStr);
     return date.toLocaleString("pt-BR", {
@@ -91,7 +73,6 @@ const handleDownloadReceipt = (order: Order) => {
     "=".repeat(MAX_LINE_WIDTH),
     center("SHAWARMA ROSUL"),
     "=".repeat(MAX_LINE_WIDTH),
-
     center("CNPJ: 60.457.577/0001-59"),
     center("Rua Amaro Souto, 3023"),  
     center("Apto 210 - Centro"),
@@ -102,9 +83,7 @@ const handleDownloadReceipt = (order: Order) => {
     `Cliente: ${order.customerName}`,
     `Contato: ${order.customerPhone}`,
     ...(order.consumptionMethod === "entrega"
-      ? wrapText(address, MAX_LINE_WIDTH).map((line, idx) =>
-          idx === 0 ? `Local: ${line}` : `       ${line}`
-        )
+      ? [`Local: ${address}`]
       : ["Local: Retirada no local"]),
     "-".repeat(MAX_LINE_WIDTH),
     `Itens do Pedido:`,
@@ -142,13 +121,16 @@ const handleDownloadReceipt = (order: Order) => {
     "=".repeat(MAX_LINE_WIDTH),
   ];
 
-  const lineHeight = 3.5;
-  const margin = 1;
-  const totalHeight = receiptLines.length * lineHeight + 20;
+  const lineHeight = 4;
+  const margin = 2;
+  const pageWidth = 57; // mm
+  const textAreaWidth = 55; // segurança contra corte
+
+  const estimatedHeight = receiptLines.length * lineHeight + 30;
 
   const doc = new jsPDF({
     unit: "mm",
-    format: [57, totalHeight],
+    format: [pageWidth, estimatedHeight],
   });
 
   doc.setFont("Courier", "normal");
@@ -157,8 +139,11 @@ const handleDownloadReceipt = (order: Order) => {
   let y = 10;
 
   receiptLines.forEach((line) => {
-    doc.text(line, margin, y);
-    y += lineHeight;
+    const wrapped = doc.splitTextToSize(line, textAreaWidth);
+    wrapped.forEach((segment: string) => {
+      doc.text(segment, margin, y);
+      y += lineHeight;
+    });
   });
 
   doc.save(`comprovante_pedido_${order.id}.pdf`);

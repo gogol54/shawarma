@@ -90,6 +90,8 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
     switch (status) {
       case 'PENDING':
         return <span className="text-yellow-600 font-medium">Pendente</span>
+      case 'APPROVED':
+        return <span className="text-green-500 font-medium">Pagamento Aprovado</span>
       case 'IN_PREPARATION':
         return <span className="text-blue-600 font-medium">Em preparo</span>
       case 'DELIVERY':
@@ -227,6 +229,9 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
                   </DialogContent>
                 </Dialog>
                 {/*Finda Editar */}
+
+
+
                 {/* Botão Visualizar Produtos */}
                 <Dialog>
                   <DialogTrigger asChild>
@@ -245,7 +250,35 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
                       >
                         Baixar Comprovante
                       </Button>
-
+                      <div className="justify-center text-center mb-2">
+                        <p className="text-md font-bold mt-2">
+                          Endereço:
+                        </p>
+                        {typeof order.address === 'object' &&
+                          order.address !== null &&
+                          'street' in order.address &&
+                          typeof order.address.street === 'string' && (
+                            <span className="text-sm text-gray-500"> R. {order.address.street}, </span>
+                        )}
+                        {typeof order.address === 'object' &&
+                          order.address !== null &&
+                          'number' in order.address &&
+                          typeof order.address.number === 'string' && (
+                            <span className="text-sm text-gray-500">n° {order.address.number} - </span>
+                        )}
+                        {typeof order.address === 'object' &&
+                          order.address !== null &&
+                          'complement' in order.address &&
+                          typeof order.address.complement === 'string' && (
+                            <span className="text-sm text-gray-500">{order.address.complement}</span>
+                        )}
+                        {typeof order.address === 'object' &&
+                          order.address !== null &&
+                          'zone' in order.address &&
+                          typeof order.address.zone === 'string' && (
+                            <p className="text-sm text-gray-500">Bairro: {order.address.zone}</p>
+                        )}
+                      </div>
                       {order.orderProducts.length > 0 ? (
                         <>
                           {order.orderProducts.map((product, index) => (
@@ -270,19 +303,25 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
                             <p className="text-md font-semibold">
                               Valor: {formatCurrency(order.orderProducts.reduce((acc, product) => acc + product.price, 0))}
                             </p>
-                            {order.consumptionMethod === 'entrega' && (
+                            {order.consumptionMethod === 'entrega' ? (
                               <p className="text-md font-semibold">
                                 Entrega: {formatCurrency(motoboy)}
+                              </p>)
+                              :
+                              (<p className="text-md font-semibold">
+                                Método: Retirada no local
                               </p>
                             )}
-                            <p className="text-lg font-bold">
-                              Total Final: {
+                            <p className="text-lg font-bold text-center">
+                              Total: {
                                 formatCurrency(
                                   order.orderProducts.reduce((acc, product) => acc + product.price, 0) +
                                   (order.consumptionMethod === 'entrega' ? motoboy : 0)
                                 )
                               }
                             </p>
+                            
+                           
                           </div>
                         </>
                       ) : (
@@ -293,6 +332,9 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
 
                 </Dialog>
                 {/* Finda Visualizar Produtos */}
+
+
+
                 {/*Init delete order*/}
                 <Button onClick={() => showDeleteConfirmation(() => deleteOrder(order.id))}>
                   <Trash2 className="w-4 h-4" />
