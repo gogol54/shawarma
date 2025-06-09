@@ -86,6 +86,19 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
     return `${diffMins} min`
   }
 
+  const formatDate = (createdAt: Date | string): string => {
+  const date = new Date(createdAt);
+
+  return date.toLocaleString('pt-BR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+
   const statusFormatter = (status: string) => {
     switch (status) {
       case 'PENDING':
@@ -167,6 +180,7 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
             <TableHead>Celular</TableHead>
             <TableHead>Entrega</TableHead>
             <TableHead>Tempo</TableHead>
+            <TableHead>Data </TableHead>            
             <TableHead>Pagamento</TableHead>
             <TableHead>Total</TableHead>
             <TableHead>Status</TableHead>
@@ -182,6 +196,9 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
               <TableCell>{order.consumptionMethod}</TableCell>
               <TableCell>
                 {getMinutesSince(order.createdAt, order.status)}
+              </TableCell>
+              <TableCell className="w-20 whitespace-normal text-sm leading-tight">
+                {formatDate(order.createdAt)}
               </TableCell>
               <TableCell>
                 <select
