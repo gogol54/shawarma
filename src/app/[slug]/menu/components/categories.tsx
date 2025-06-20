@@ -1,14 +1,14 @@
 'use client'
 
-import { Prisma } from "@prisma/client";
-import { ClockIcon, LockIcon } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useContext, useEffect, useState } from "react";
+import { Prisma } from "@prisma/client"
+import { ClockIcon, LockIcon } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
+import { useContext, useEffect, useRef,useState } from "react"
 
-import { formatCurrency } from "@/app/helpers/format-currency";
-import { fetchIsRestaurantOpen } from "@/app/helpers/is-open";
-import { Button } from "@/components/ui/button";
+import { formatCurrency } from "@/app/helpers/format-currency"
+import { fetchIsRestaurantOpen } from "@/app/helpers/is-open"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -16,11 +16,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 
-import { CartContext } from "../contexts/cart";
-import CartSheet from "./cart-sheet";
-import Products from "./products";
+import { CartContext } from "../contexts/cart"
+import CartSheet from "./cart-sheet"
+import Products from "./products"
 
 interface RestaurantCategoriesProps {
   restaurant: Prisma.RestaurantGetPayload<{
@@ -34,14 +34,11 @@ interface RestaurantCategoriesProps {
 }
 
 const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProps) => {
-  const { products, total, totalQuantity, setIsOpen } = useContext(CartContext);
+  const { products, total, totalQuantity, setIsOpen } = useContext(CartContext)
   const [open, setOpenRestaurant] = useState<boolean | null>(null)
   const [openDialog, setOpenDialog] = useState<boolean | null>(null)
-  const [selectedCategory, setSelectedCategory] = useState<typeof restaurant.menuCategories[0] | null>(null);
-
-  const handleClickTimeStamp = () => {
-    setOpenDialog(true)
-  }
+  const [selectedCategory, setSelectedCategory] = useState<typeof restaurant.menuCategories[0] | null>(null)
+  const sectionRefs = useRef<Record<string, HTMLElement>>({})
 
   const daysOfWeek = [
     { label: "Domingo", limited: false },
@@ -51,87 +48,83 @@ const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProp
     { label: "Quinta-feira", limited: false },
     { label: "Sexta-feira", limited: false },
     { label: "Sábado", limited: false },
-  ];
+  ]
 
   useEffect(() => {
-    const savedCategoryName = localStorage.getItem("selectedCategory");
-
-    if (savedCategoryName) {
-      const foundCategory = restaurant.menuCategories.find(
-        (cat) => cat.name === savedCategoryName
-      );
-
-      if (foundCategory) {
-        setSelectedCategory(foundCategory);
-      } else {
-        setSelectedCategory(restaurant.menuCategories[0]);
-      }
-    } else {
-      setSelectedCategory(restaurant.menuCategories[0]);
-    }
-  }, [restaurant.menuCategories]);
+    setSelectedCategory(restaurant.menuCategories[0])
+  }, [restaurant.menuCategories])
 
   useEffect(() => {
     const checkOpen = async () => {
-      const isOpen = await fetchIsRestaurantOpen();
-      setOpenRestaurant(isOpen);
-    };
-    checkOpen();
-  }, [restaurant.id]);
+      const isOpen = await fetchIsRestaurantOpen()
+      setOpenRestaurant(isOpen)
+    }
+    checkOpen()
+  }, [restaurant.id])
 
-  // 👇 Scroll automático
+  // Monta o ref das seções
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.find((entry) => entry.isIntersecting);
-        if (visible) {
-          const id = visible.target.getAttribute('id');
-          const name = id?.replace('category-', '').replace(/-/g, ' ');
-          const foundCategory = restaurant.menuCategories.find(
-            (cat) => cat.name.toLowerCase() === name
-          );
-          if (foundCategory) {
-            setSelectedCategory(foundCategory);
-            localStorage.setItem("selectedCategory", foundCategory.name);
-          }
-        }
-      },
-      {
-        rootMargin: '-20% 0px -75% 0px',
-        threshold: 0.1,
+    const refs: Record<string, HTMLElement> = {}
+    restaurant.menuCategories.forEach(category => {
+      const id = `category-${category.name.toLowerCase().replace(/\s+/g, '-')}`
+      const el = document.getElementById(id)
+      if (el) {
+        refs[category.name] = el
       }
-    );
+    })
+    sectionRefs.current = refs
+  }, [restaurant.menuCategories])
 
-    restaurant.menuCategories.forEach((cat) => {
-      const el = document.getElementById(`category-${cat.name.toLowerCase().replace(/\s+/g, '-')}`);
-      if (el) observer.observe(el);
-    });
+  // Função para detectar a seção visível pelo scroll
+  useEffect(() => {
+    const onScroll = () => {
+      const scrollPosition = window.scrollY + 100 // Ajusta conforme a altura da barra sticky etc
 
-    return () => observer.disconnect();
-  }, [restaurant.menuCategories]);
+      let currentCategory = restaurant.menuCategories[0].name
+
+      for (const category of restaurant.menuCategories) {
+        const el = sectionRefs.current[category.name]
+        if (!el) continue
+        if (el.offsetTop <= scrollPosition) {
+          currentCategory = category.name
+        }
+      }
+
+      if (currentCategory !== selectedCategory?.name) {
+        setSelectedCategory(restaurant.menuCategories.find(cat => cat.name === currentCategory) || null)
+      }
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true })
+
+    return () => {
+      window.removeEventListener("scroll", onScroll)
+    }
+  }, [restaurant.menuCategories, selectedCategory])
+
+  const handleClickTimeStamp = () => setOpenDialog(true)
 
   const handleCategoryClick = (category: typeof restaurant.menuCategories[0]) => {
-    const el = document.getElementById(`category-${category.name.toLowerCase().replace(/\s+/g, '-')}`);
+    const el = sectionRefs.current[category.name]
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      window.scrollTo({ top: el.offsetTop - 80, behavior: "smooth" }) // Ajuste -80 para compensar sticky header
     }
-    setSelectedCategory(category);
-    localStorage.setItem("selectedCategory", category.name);
+    setSelectedCategory(category)
   }
 
-  const getCategoryBtn = (category: string) => {
-    return selectedCategory?.name === category ? "default" : "secondary";
-  }
+  const getCategoryBtn = (category: string) =>
+    selectedCategory?.name === category ? "default" : "secondary"
 
   return (
     <div className="relative z-50 mt-[-1.5rem] rounded-t-3xl bg-white">
       <div className="p-5">
+        {/* Header restaurante */}
         <div className="flex items-center gap-2">
-          <Image 
-            src={restaurant.avatarImageUrl} 
+          <Image
+            src={restaurant.avatarImageUrl}
             alt={restaurant.name}
-            width={45} 
-            height={45} 
+            width={45}
+            height={45}
             quality={100}
             className="object-cover rounded-lg"
           />
@@ -142,7 +135,7 @@ const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProp
         </div>
 
         <div className="flex justify-start">
-          <Button 
+          <Button
             className="bg-[#f5f5f5] text-[#333333] hover:bg-gray-200 mt-4 mb-2 w-32 max-h-8"
             onClick={handleClickTimeStamp}
           >
@@ -201,33 +194,36 @@ const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProp
         </div>
       </div>
 
-      {/* Menu de categorias */}
-      <ScrollArea className="w-full">
-        <div className="flex w-max space-x-4 p-4 pt-0">
-          {restaurant.menuCategories.map((category) => (
-            <Button 
-              onClick={() => handleCategoryClick(category)}
-              key={category.id}
-              variant={getCategoryBtn(category.name)}
-              size="sm"
-              className="rounded-full whitespace-nowrap"
-            >
-              {category.name}
-            </Button>
-          ))}
+      {/* Menu fixo com categorias */}
+      <div className="sticky top-0 z-40 bg-white pt-3 pb-1 shadow-md">
+        <div className="px-5 pb-2 font-semibold text-base">
         </div>
-        <ScrollBar orientation="horizontal"/>
-      </ScrollArea>
+        <ScrollArea className="overflow-hidden w-full">
+          <div className="flex w-max space-x-4 px-5">
+            {restaurant.menuCategories.map((category) => (
+              <Button
+                key={category.id}
+                onClick={() => handleCategoryClick(category)}
+                variant={getCategoryBtn(category.name)}
+                size="sm"
+                className="rounded-full whitespace-nowrap"
+              >
+                {category.name}
+              </Button>
+            ))}
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+      </div>
 
-      {/* Todas as seções renderizadas com IDs */}
+      {/* Conteúdo das categorias */}
       <div>
         {restaurant.menuCategories.map((category) => (
           <section
             key={category.id}
             id={`category-${category.name.toLowerCase().replace(/\s+/g, '-')}`}
-            className="scroll-mt-32"
+            className="scroll-mt-[120px] mt-4 min-h-[200px]"
           >
-            <h3 className="font-semibold px-5 pt-8">{category.name}</h3>
             <Products products={category.products} />
           </section>
         ))}
@@ -250,7 +246,7 @@ const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProp
         </div>
       )}
     </div>
-  );
+  )
 }
 
-export default RestaurantCategories;
+export default RestaurantCategories
