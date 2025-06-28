@@ -4,7 +4,7 @@ import { Prisma } from "@prisma/client"
 import { ClockIcon, LockIcon } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { useContext, useEffect, useRef,useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 
 import { formatCurrency } from "@/app/helpers/format-currency"
 import { fetchIsRestaurantOpen } from "@/app/helpers/is-open"
@@ -62,24 +62,19 @@ const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProp
     checkOpen()
   }, [restaurant.id])
 
-  // Monta o ref das seções
   useEffect(() => {
     const refs: Record<string, HTMLElement> = {}
     restaurant.menuCategories.forEach(category => {
       const id = `category-${category.name.toLowerCase().replace(/\s+/g, '-')}`
       const el = document.getElementById(id)
-      if (el) {
-        refs[category.name] = el
-      }
+      if (el) refs[category.name] = el
     })
     sectionRefs.current = refs
   }, [restaurant.menuCategories])
 
-  // Função para detectar a seção visível pelo scroll
   useEffect(() => {
     const onScroll = () => {
-      const scrollPosition = window.scrollY + 100 // Ajusta conforme a altura da barra sticky etc
-
+      const scrollPosition = window.scrollY + 100
       let currentCategory = restaurant.menuCategories[0].name
 
       for (const category of restaurant.menuCategories) {
@@ -91,138 +86,148 @@ const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProp
       }
 
       if (currentCategory !== selectedCategory?.name) {
-        setSelectedCategory(restaurant.menuCategories.find(cat => cat.name === currentCategory) || null)
+        setSelectedCategory(
+          restaurant.menuCategories.find(cat => cat.name === currentCategory) || null
+        )
       }
     }
 
     window.addEventListener("scroll", onScroll, { passive: true })
-
-    return () => {
-      window.removeEventListener("scroll", onScroll)
-    }
+    return () => window.removeEventListener("scroll", onScroll)
   }, [restaurant.menuCategories, selectedCategory])
 
   const handleClickTimeStamp = () => setOpenDialog(true)
 
   const handleCategoryClick = (category: typeof restaurant.menuCategories[0]) => {
-    const el = sectionRefs.current[category.name]
-    if (el) {
-      window.scrollTo({ top: el.offsetTop - 80, behavior: "smooth" }) // Ajuste -80 para compensar sticky header
-    }
     setSelectedCategory(category)
+
+    const id = `category-${category.name.toLowerCase().replace(/\s+/g, '-')}`
+    const el = document.getElementById(id)
+
+    if (el) {
+      window.scrollTo({ top: el.offsetTop - 200, behavior: "smooth" })
+    } else {
+      setTimeout(() => {
+        const retryEl = document.getElementById(id)
+        if (retryEl) {
+          window.scrollTo({ top: retryEl.offsetTop - 200, behavior: "smooth" })
+        }
+      }, 100)
+    }
   }
 
   const getCategoryBtn = (category: string) =>
     selectedCategory?.name === category ? "default" : "secondary"
 
   return (
-    <div className="relative z-50 mt-[-1.5rem] rounded-t-3xl bg-white">
-      <div className="p-5">
-        {/* Header restaurante */}
-        <div className="flex items-center gap-2">
-          <Image
-            src={restaurant.avatarImageUrl}
-            alt={restaurant.name}
-            width={45}
-            height={45}
-            quality={100}
-            className="object-cover rounded-lg"
-          />
-          <div>
-            <h2 className="text-lg font-semibold">{restaurant.name}</h2>
-            <p className="text-xs opacity-55">{restaurant.description}</p>
+    <div className="relative bg-white rounded-t-3xl">
+      {/* Header + Categorias Fixas */}
+      <div className="sticky top-0 z-50 mt-[-1.5rem] bg-white rounded-t-3xl">
+        <div className="px-5 pt-4 pb-2">
+          <div className="flex items-center gap-2">
+            <Image
+              src={restaurant.avatarImageUrl}
+              alt={restaurant.name}
+              width={45}
+              height={45}
+              quality={100}
+              className="object-cover rounded-lg"
+            />
+            <div>
+              <h2 className="text-lg font-semibold">{restaurant.name}</h2>
+              <p className="text-xs opacity-55">{restaurant.description}</p>
+            </div>
+          </div>
+
+          <div className="flex justify-start">
+            <Button
+              className="bg-[#f5f5f5] text-[#333333] hover:bg-gray-200 mt-4 mb-2 w-32 max-h-8"
+              onClick={handleClickTimeStamp}
+            >
+              <p className="text-xs">Horário da Semana</p>
+            </Button>
+          </div>
+
+          <div className="flex flex-row justify-between text-xs mt-1 items-center">
+            {open ? (
+              <div className="flex flex-row items-center">
+                <ClockIcon size={12} className="mt-1 mr-1 text-green-500" />
+                <p className="font-semibold text-green-500 mt-1 text-[14px]">Aberto!</p>
+              </div>
+            ) : (
+              <div className="flex flex-row items-center">
+                <LockIcon size={12} className="mt-1 mr-1 text-red-500" />
+                <p className="font-semibold text-red-500 mt-1 text-[14px]">Fechado</p>
+              </div>
+            )}
+            <div>
+              <Link href={`/${restaurant.slug}/orders`} className="text-blue-500 text-[14px] underline">
+                Meus pedidos
+              </Link>
+            </div>
           </div>
         </div>
 
-        <div className="flex justify-start">
-          <Button
-            className="bg-[#f5f5f5] text-[#333333] hover:bg-gray-200 mt-4 mb-2 w-32 max-h-8"
-            onClick={handleClickTimeStamp}
-          >
-            <p className="text-xs">Horário da Semana</p>
-          </Button>
-        </div>
-
-        <Dialog open={openDialog === true && Array.isArray(openWeek)} onOpenChange={() => setOpenDialog(!openDialog)}>
-          <DialogTrigger asChild />
-          <DialogContent className="max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Horários de Funcionamento</DialogTitle>
-            </DialogHeader>
-            <div className="mt-4 space-y-3">
-              {openWeek.map((day) => (
-                <div
-                  key={day.id}
-                  className={`flex items-center justify-between rounded-xl border px-4 py-3 ${
-                    day.isOpen ? "bg-green-50" : "bg-red-50"
-                  }`}
+        {/* Menu de categorias */}
+        <div className="pb-3">
+          <ScrollArea>
+            <div className="flex w-max space-x-4 px-5">
+              {restaurant.menuCategories.map((category) => (
+                <Button
+                  key={category.id}
+                  onClick={() => handleCategoryClick(category)}
+                  variant={getCategoryBtn(category.name)}
+                  size="sm"
+                  className="rounded-full whitespace-nowrap"
                 >
-                  <div className="flex items-center gap-2">
-                    {day.isOpen ? (
-                      <ClockIcon className="text-green-600" size={20} />
-                    ) : (
-                      <LockIcon className="text-red-600" size={20} />
-                    )}
-                    <p className="font-medium">{daysOfWeek[day.dayOfWeek].label}</p>
-                  </div>
-                  <div className="text-sm font-semibold text-muted-foreground">
-                    {day.isOpen ? `${day.openTime} às ${day.closeTime}` : "Fechado"}
-                  </div>
-                </div>
+                  {category.name}
+                </Button>
               ))}
             </div>
-          </DialogContent>
-        </Dialog>
-
-        <div className="flex flex-row justify-between text-xs mt-3 items-center">
-          {open ? (
-            <div className="flex flex-row items-center">
-              <ClockIcon size={12} className="mt-1 mr-1 text-green-500" />
-              <p className="font-semibold text-green-500 mt-1 text-[14px]">Aberto!</p>
-            </div>
-          ) : (
-            <div className="flex flex-row items-center">
-              <LockIcon size={12} className="mt-1 mr-1 text-red-500" />
-              <p className="font-semibold text-red-500 mt-1 text-[14px]">Fechado</p>
-            </div>
-          )}
-          <div>
-            <Link href={`/${restaurant.slug}/orders`} className="text-blue-500 text-[14px] underline">
-              Meus pedidos
-            </Link>
-          </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
         </div>
       </div>
 
-      {/* Menu fixo com categorias */}
-      <div className="sticky top-0 z-40 bg-white pt-3 pb-1 shadow-md">
-        <div className="px-5 pb-2 font-semibold text-base">
-        </div>
-        <ScrollArea className="overflow-hidden w-full">
-          <div className="flex w-max space-x-4 px-5">
-            {restaurant.menuCategories.map((category) => (
-              <Button
-                key={category.id}
-                onClick={() => handleCategoryClick(category)}
-                variant={getCategoryBtn(category.name)}
-                size="sm"
-                className="rounded-full whitespace-nowrap"
+      {/* Diálogo de horários */}
+      <Dialog open={openDialog === true && Array.isArray(openWeek)} onOpenChange={() => setOpenDialog(!openDialog)}>
+        <DialogTrigger asChild />
+        <DialogContent className="max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Horários de Funcionamento</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4 space-y-3">
+            {openWeek.map((day) => (
+              <div
+                key={day.id}
+                className={`flex items-center justify-between rounded-xl border px-4 py-3 ${
+                  day.isOpen ? "bg-green-50" : "bg-red-50"
+                }`}
               >
-                {category.name}
-              </Button>
+                <div className="flex items-center gap-2">
+                  {day.isOpen ? (
+                    <ClockIcon className="text-green-600" size={20} />
+                  ) : (
+                    <LockIcon className="text-red-600" size={20} />
+                  )}
+                  <p className="font-medium">{daysOfWeek[day.dayOfWeek].label}</p>
+                </div>
+                <div className="text-sm font-semibold text-muted-foreground">
+                  {day.isOpen ? `${day.openTime} às ${day.closeTime}` : "Fechado"}
+                </div>
+              </div>
             ))}
           </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
-      </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Conteúdo das categorias */}
-      <div>
+      <div className="px-5 pb-20">
         {restaurant.menuCategories.map((category) => (
           <section
             key={category.id}
             id={`category-${category.name.toLowerCase().replace(/\s+/g, '-')}`}
-            className="scroll-mt-[120px] mt-4 min-h-[200px]"
+            className="scroll-mt-[200px] mt-4 min-h-[200px]"
           >
             <Products products={category.products} />
           </section>
