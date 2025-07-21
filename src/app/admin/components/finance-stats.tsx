@@ -23,12 +23,14 @@ type ExpenseItem = {
   description: string;
   amount: number;
   reference: string; // precisa estar aqui para filtrar no frontend
+  createdAt: Date;
 }
 
 type FinanceStatsProps = {
   summaryByMonth: SummaryItem[];
   expensesByMonth: ExpenseByMonth[];
   expenseValues: ExpenseItem[];
+  totalSales: { month: string; totalSales: number }[]; // ⬅️ novo
 };
 // Função utilitária para calcular % de variação
 function calcPercentChange(current: number, previous: number): number | null {
@@ -52,7 +54,11 @@ function getReferenceFromDate(dateString: string): string {
   return dateString?.slice(0, 7) || "";
 }
 
-export default function FinanceStats({ summaryByMonth, expensesByMonth, expenseValues }: FinanceStatsProps) {
+export default function FinanceStats({ 
+  summaryByMonth, 
+  expensesByMonth, 
+  expenseValues,
+  totalSales }: FinanceStatsProps) {
   const recentMonths = summaryByMonth.slice(0, 4);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
 
@@ -86,6 +92,9 @@ export default function FinanceStats({ summaryByMonth, expensesByMonth, expenseV
     const expenseTotal = expense?.total || 0;
     const lucro = summary.revenue - expenseTotal;
 
+    const sales = totalSales.find((s) => s.month === summary.month);
+    const totalSals = sales?.totalSales || 0;
+
     return {
       month: summary.month,
       formattedMonth: formatMonth(summary.month),
@@ -95,6 +104,7 @@ export default function FinanceStats({ summaryByMonth, expensesByMonth, expenseV
       formattedExpense: formatCurrency(expenseTotal),
       lucro,
       formattedLucro: formatCurrency(lucro),
+      totalSals
     };
   });
 
@@ -185,10 +195,12 @@ export default function FinanceStats({ summaryByMonth, expensesByMonth, expenseV
             <ul className="space-y-2">
               {expenseValues
                 .filter((item) => item.reference === selectedMonth) // filtra pelo mês
-                .map((item) => (
-                  <li key={item.id} className="flex justify-between">
-                    <span>{item.description}</span>
-                    <span className="text-red-600">{formatCurrency(item.amount)}</span>
+                .map((item, index) => (
+                  <li key={item.id} className="flex gap-2">
+                    <span className="w-[30px] text-left font-bold">{index + 1}</span>
+                    <span className="w-[200px] text-left truncate">{item.description}</span>
+                    <span className="w-[120px] text-left">{item.createdAt.toLocaleDateString()}</span>
+                    <span className="w-[100px] text-left text-red-600">{formatCurrency(item.amount)}</span>
                   </li>
                 ))}
               {expenseValues.filter((item) => item.reference === selectedMonth).length === 0 && (
@@ -201,19 +213,22 @@ export default function FinanceStats({ summaryByMonth, expensesByMonth, expenseV
       {/* Ganhos Mensais */}
       <section>
         <h2 className="text-2xl font-semibold mb-4">Faturamento Mensal 💰</h2>
-
         <div className="border rounded-md overflow-hidden">
-          <div className="hidden md:grid grid-cols-5 font-semibold bg-gray-100 p-3">
+          {/* Cabeçalho */}
+          <div className="hidden md:grid grid-cols-6 font-semibold bg-gray-100 p-3 text-center">
             <span>Mês</span>
             <span>Ganhos</span>
             <span>Gastos</span>
             <span>Lucro</span>
+            <span>Qtd. Vendas</span>
             <span>Lista de Compras</span>
           </div>
+
+          {/* Linhas de dados */}
           {merged.map((item) => (
             <div
               key={item.month}
-              className="border-t p-3 text-lg items-center flex flex-col md:grid md:grid-cols-5 gap-2 md:gap-0 text-center"
+              className="border-t p-3 text-lg items-center flex flex-col md:grid md:grid-cols-6 gap-2 md:gap-0 text-center"
             >
               <div className="w-full md:w-auto">{item.formattedMonth}</div>
               <div className="w-full md:w-auto whitespace-nowrap">{item.formattedRevenue}</div>
@@ -225,13 +240,16 @@ export default function FinanceStats({ summaryByMonth, expensesByMonth, expenseV
               >
                 {item.formattedLucro}
               </div>
-              <button
-                onClick={() => setSelectedMonth(item.month)}
-                className="text-blue-600 hover:underline flex items-center justify-center gap-1"
-                title="Ver lista de compras"
-              >
-                🧾 Ver
-              </button>
+              <div className="w-full md:w-auto">{item.totalSals}</div>
+              <div className="w-full md:w-auto flex justify-center">
+                <button
+                  onClick={() => setSelectedMonth(item.month)}
+                  className="text-blue-600 hover:underline flex items-center justify-center gap-1"
+                  title="Ver lista de compras"
+                >
+                  🧾 Ver
+                </button>
+              </div>
             </div>
           ))}
         </div>

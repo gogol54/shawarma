@@ -14,6 +14,7 @@ export default async function FinancesPage() {
 
   return (
     <FinanceStats
+      totalSales={stats.totalSalesByMonth}
       summaryByMonth={stats.summaryByMonth}
       expensesByMonth={expenses}
       expenseValues={list}

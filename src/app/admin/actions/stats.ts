@@ -59,6 +59,17 @@ export async function getTopLanchesStatsByMonth() {
   })
   .sort((a, b) => b.month.localeCompare(a.month));
 
+  const totalSalesByMonth: { month: string; totalSales: number }[] = [];
+
+  for (const item of result) {
+    const existing = totalSalesByMonth.find(r => r.month === item.month);
+    if (existing) {
+      existing.totalSales += item.totalSold;
+    } else {
+      totalSalesByMonth.push({ month: item.month, totalSales: item.totalSold });
+    }
+  }
+
   const sortedStatsByProductAndMonth = result.sort((a, b) => {
     // Primeiro: ordenar por mês (descendente)
     if (a.month !== b.month) {
@@ -68,8 +79,10 @@ export async function getTopLanchesStatsByMonth() {
     // Segundo: ordenar por totalSold dentro do mesmo mês (descendente)
     return b.totalSold - a.totalSold;
   });
+  
   return {
     statsByProductAndMonth: sortedStatsByProductAndMonth,
-    summaryByMonth: monthlySummaryFormatted
+    summaryByMonth: monthlySummaryFormatted,
+    totalSalesByMonth
   };
 }
