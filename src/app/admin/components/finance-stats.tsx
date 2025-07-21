@@ -131,7 +131,7 @@ export default function FinanceStats({ summaryByMonth, expensesByMonth, expenseV
     <div className="p-6 space-y-8 max-w-4xl mx-auto ">
 
       {/* Variações de receita */}
-      <div  className="h-[200px] w-full bg-gradient-to-r from-emerald-600 to-emerald-400 shadow-md rounded-b-2xl justify-center px-10">
+      <div className="w-full bg-gradient-to-r from-emerald-600 to-emerald-400 shadow-md rounded-b-2xl justify-center px-10 py-8">
         <h1 className="text-3xl font-bold text-white mb-6">Finanças 🤑💼 </h1>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {variations.map(({ monthCurrent, monthPrevious, change }) => {
