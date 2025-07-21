@@ -203,7 +203,7 @@ export default function FinanceStats({ summaryByMonth, expensesByMonth, expenseV
         <h2 className="text-2xl font-semibold mb-4">Faturamento Mensal 💰</h2>
 
         <div className="border rounded-md overflow-hidden">
-          <div className="grid grid-cols-5 font-semibold bg-gray-100 p-3">
+          <div className="hidden md:grid grid-cols-5 font-semibold bg-gray-100 p-3">
             <span>Mês</span>
             <span>Ganhos</span>
             <span>Gastos</span>
@@ -213,21 +213,21 @@ export default function FinanceStats({ summaryByMonth, expensesByMonth, expenseV
           {merged.map((item) => (
             <div
               key={item.month}
-              className="grid grid-cols-5 border-t p-3 text-lg items-center"
+              className="border-t p-3 text-lg items-center flex flex-col md:grid md:grid-cols-5 gap-2 md:gap-0 text-center"
             >
-              <span className="whitespace-nowrap">{item.formattedMonth}</span>
-              <span className="whitespace-nowrap">{item.formattedRevenue}</span>
-              <span className="whitespace-nowrap text-red-600">{item.formattedExpense}</span>
-              <span
-                className={`whitespace-nowrap ${
+              <div className="w-full md:w-auto">{item.formattedMonth}</div>
+              <div className="w-full md:w-auto whitespace-nowrap">{item.formattedRevenue}</div>
+              <div className="w-full md:w-auto text-red-600 whitespace-nowrap">{item.formattedExpense}</div>
+              <div
+                className={`w-full md:w-auto whitespace-nowrap ${
                   item.lucro >= 0 ? "text-green-600" : "text-red-700"
                 }`}
               >
                 {item.formattedLucro}
-              </span>
+              </div>
               <button
                 onClick={() => setSelectedMonth(item.month)}
-                className="text-blue-600 hover:underline flex items-center gap-1 whitespace-nowrap"
+                className="text-blue-600 hover:underline flex items-center justify-center gap-1"
                 title="Ver lista de compras"
               >
                 🧾 Ver
