@@ -34,7 +34,7 @@ const openWeek = await db.openingHours.findMany({
 });  
 
 const randomData = restaurant?.menuCategories
-  const ordem = ['salgados','doces','combos', 'fritas', 'bebidas' ]; // você pode incluir mais categorias aqui
+  const ordem = ['salgados','doces','combos','fritas', 'bebidas' ]; // você pode incluir mais categorias aqui
   randomData?.sort((a, b) => {
     const indexA = ordem.indexOf(a.name.toLowerCase());
     const indexB = ordem.indexOf(b.name.toLowerCase());

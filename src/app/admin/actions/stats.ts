@@ -10,25 +10,6 @@ export async function getTopLanchesStatsByMonth() {
     }
   });
 
-  const totalByProduct: Record<string, { name: string; totalSold: number }> = {};
-
-  for (const item of orderProducts) {
-    const id = item.product.id;
-    const name = item.product.name;
-
-    if (!totalByProduct[id]) {
-      totalByProduct[id] = { name, totalSold: 0 };
-    }
-
-    totalByProduct[id].totalSold += item.quantity;
-  }
-
-  const top5 = Object.entries(totalByProduct)
-    .sort(([, a], [, b]) => b.totalSold - a.totalSold)
-    .slice(0, 5)
-    .map(([id]) => id);
-
-  // Novo formato: array flat por mês + produto
   const result: {
     month: string;
     name: string;
@@ -37,13 +18,10 @@ export async function getTopLanchesStatsByMonth() {
   }[] = [];
 
   for (const item of orderProducts) {
-    const productId = item.product.id;
-    if (!top5.includes(productId)) continue;
-
     const date = new Date(item.order.createdAt);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
-    const key = `${year}-${month}`; // "2025-04"
+    const key = `${year}-${month}`;
 
     const name = item.product.name;
     const totalSold = item.quantity;
@@ -58,5 +36,40 @@ export async function getTopLanchesStatsByMonth() {
     }
   }
 
-  return result;
+  // Resumo mensal
+  const monthlySummary: Record<string, number> = {};
+
+  for (const item of result) {
+    if (!monthlySummary[item.month]) {
+      monthlySummary[item.month] = 0;
+    }
+    monthlySummary[item.month] += item.totalRevenue;
+  }
+
+  // Resumo formatado
+  const monthlySummaryFormatted = Object.entries(monthlySummary).map(([month, revenue]) => {
+    return {
+      month,
+      revenue,
+      formattedRevenue: new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+      }).format(revenue)
+    };
+  })
+  .sort((a, b) => b.month.localeCompare(a.month));
+
+  const sortedStatsByProductAndMonth = result.sort((a, b) => {
+    // Primeiro: ordenar por mês (descendente)
+    if (a.month !== b.month) {
+      return b.month.localeCompare(a.month);
+    }
+
+    // Segundo: ordenar por totalSold dentro do mesmo mês (descendente)
+    return b.totalSold - a.totalSold;
+  });
+  return {
+    statsByProductAndMonth: sortedStatsByProductAndMonth,
+    summaryByMonth: monthlySummaryFormatted
+  };
 }

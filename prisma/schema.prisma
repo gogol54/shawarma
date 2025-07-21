@@ -23,6 +23,7 @@ model Restaurant {
   menuCategories MenuCategory[]
   products       Product[]
   orders         Order[]
+  expenses       Expense[]
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 }
@@ -95,6 +96,16 @@ enum OrderStatus {
 enum ConsumptionMethod {
   entrega
   retirada
+}
+
+model Expense {
+  id           String     @id @default(uuid())
+  description  String
+  amount       Float
+  reference    String     // formato: YYYY-MM
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
 }
 
 model OrderProduct {

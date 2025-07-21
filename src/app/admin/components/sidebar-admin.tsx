@@ -1,4 +1,5 @@
 import { 
+  CircleDollarSign,
   FileArchive,
   Home, 
   Plus,
@@ -24,6 +25,11 @@ export function AppSidebar({ token }: { token: string }) {
       title: "Dashboard",
       url: getPanelRoute(token, 'dashboard'),
       icon: Home,
+    },
+    {
+      title: "Finanças",
+      url: getPanelRoute(token, 'finance'),
+      icon: CircleDollarSign,
     },
     {
       title: "Horário de Funcionamento",

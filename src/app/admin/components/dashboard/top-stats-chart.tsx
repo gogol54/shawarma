@@ -44,7 +44,7 @@ const TopLanchesChart = ({ data }: ChartProps) => {
   const allNames = Array.from(new Set(data.map(d => d.name)));
 
   const colors = [
-    "#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6"
+    "#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#12312", 'pink', 'brown', 'yellow', 'gray', 'iceblue'
   ];
 
   return (

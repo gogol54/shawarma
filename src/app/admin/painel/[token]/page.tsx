@@ -6,6 +6,7 @@ import { verifyToken } from '../../actions/verify-token'
 import { AppSidebar } from '../../components/sidebar-admin'
 import DashboardPage from '../../pages/dashboard'
 import OpeningHoursForm from '../../pages/date-is-open'
+import FinancesPage from '../../pages/finances'
 import OrdersList from '../../pages/orders-list'
 import CreateProducts from '../../pages/products-create'
 import ProductsList from '../../pages/products-list'
@@ -21,6 +22,8 @@ const getComponent = (route?: string) => {
       return <OrdersList />
     case 'horario': 
       return <OpeningHoursForm />
+    case 'finance':
+      return <FinancesPage />
     case 'produtos':
       return <ProductsList />
     case 'cadastrar':
