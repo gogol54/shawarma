@@ -66,3 +66,43 @@ export async function getAllExpenses() {
     orderBy: { createdAt: "desc" },
   });
 }
+
+
+export async function updateExpenseData(
+    id: string, 
+    payload: { 
+      description?: string; 
+      amount?: number;
+      reference?: string;
+    }) {
+  if (!id) return { error: "Dados inválidos" }
+
+  try {
+    await db.expense.update(
+      { 
+        where: { id }, 
+        data: {
+          description: payload.description, 
+          amount: payload.amount
+        } 
+      })
+    revalidatePath("/admin/pages/finances") // 🔁 forçar recarregamento da lista
+    return { success: true }
+  } catch (err) {
+    console.error("Erro ao atualizar pedido", err)
+    return { error: "Erro ao atualizar pedido" }
+  }
+}
+
+export async function deleteExpense(id: string) {
+  if (!id) return { success: false, error: 'ID inválido' }
+
+  try {
+    await db.expense.delete({ where: { id } })
+    revalidatePath('/admin/pages/finances')
+    return { success: true }
+  } catch (error) {
+    console.error('Erro ao deletar despesa:', error)
+    return { success: false, error: 'Erro ao deletar despesa' }
+  }
+}

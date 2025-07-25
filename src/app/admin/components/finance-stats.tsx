@@ -5,7 +5,11 @@ import { toast } from "sonner";
 
 import { formatCurrency } from "@/app/helpers/format-currency";
 
-import { createExpense } from "../actions/expense-actions";
+import { 
+  createExpense, 
+  deleteExpense, 
+  updateExpenseData 
+} from "../actions/expense-actions";
 
 type SummaryItem = {
   month: string; // "2025-07"
@@ -61,6 +65,7 @@ export default function FinanceStats({
   totalSales }: FinanceStatsProps) {
   const recentMonths = summaryByMonth.slice(0, 4);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
+  const [editingExpense, setEditingExpense] = useState<ExpenseItem | null>(null);
 
   const variations = recentMonths
     .map((item, idx) => {
@@ -196,13 +201,36 @@ export default function FinanceStats({
               {expenseValues
                 .filter((item) => item.reference === selectedMonth) // filtra pelo mês
                 .map((item, index) => (
-                  <li key={item.id} className="flex gap-2">
-                    <span className="w-[30px] text-left font-bold">{index + 1}</span>
-                    <span className="w-[200px] text-left truncate">{item.description}</span>
-                    <span className="w-[120px] text-left">{item.createdAt.toLocaleDateString()}</span>
-                    <span className="w-[100px] text-left text-red-600">{formatCurrency(item.amount)}</span>
-                  </li>
-                ))}
+                 <li key={item.id} className="flex gap-2 items-center">
+                  <span className="w-[30px] font-bold">{index + 1}</span>
+                  <span className="w-[200px] truncate">{item.description}</span>
+                  <span className="w-[120px]">{item.createdAt.toLocaleDateString()}</span>
+                  <span className="w-[100px] text-red-600">{formatCurrency(item.amount)}</span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setEditingExpense(item)}
+                      className="text-blue-600 hover:underline text-sm"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={async () => {
+                        const confirm = window.confirm("Deseja remover esse gasto?");
+                        if (!confirm) return;
+                        const res = await deleteExpense(item.id);
+                        if (res.success) {
+                          toast.success("Gasto removido com sucesso");
+                        } else {
+                          toast.error(res.error || "Erro ao remover");
+                        }
+                      }}
+                      className="text-red-600 hover:underline text-sm"
+                    >
+                      🗑
+                    </button>
+                  </div>
+                </li>
+              ))}
               {expenseValues.filter((item) => item.reference === selectedMonth).length === 0 && (
                 <p className="text-gray-500">Sem dados</p>
               )}
@@ -327,6 +355,69 @@ export default function FinanceStats({
                 className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
               >
                 Salvar gasto
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+      {editingExpense && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 w-full max-w-md relative">
+            <button
+              onClick={() => setEditingExpense(null)}
+              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+            >
+              Fechar
+            </button>
+
+            <h3 className="text-xl font-bold mb-4">Editar Gasto</h3>
+
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+
+                const newDescription = (e.currentTarget.elements.namedItem("description") as HTMLInputElement)?.value;
+                const newAmount = parseFloat((e.currentTarget.elements.namedItem("amount") as HTMLInputElement)?.value);
+
+                const payload: { description?: string; amount?: number } = {};
+                if (newDescription !== editingExpense.description) payload.description = newDescription;
+                if (!isNaN(newAmount) && newAmount !== editingExpense.amount) payload.amount = newAmount;
+
+                if (Object.keys(payload).length === 0) {
+                  toast.info("Nada foi alterado.");
+                  return;
+                }
+
+                const res = await updateExpenseData(editingExpense.id, payload);
+                if (res.success) {
+                  toast.success("Gasto atualizado com sucesso!");
+                  setEditingExpense(null);
+                } else {
+                  toast.error(res.error || "Erro ao atualizar gasto");
+                }
+              }}
+              className="flex flex-col gap-4"
+            >
+              <input
+                name="description"
+                type="text"
+                defaultValue={editingExpense.description}
+                className="border border-gray-300 rounded px-4 py-2"
+              />
+
+              <input
+                name="amount"
+                type="number"
+                step="0.01"
+                defaultValue={editingExpense.amount}
+                className="border border-gray-300 rounded px-4 py-2"
+              />
+
+              <button
+                type="submit"
+                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+              >
+                Salvar alterações
               </button>
             </form>
           </div>
