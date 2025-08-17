@@ -3,6 +3,8 @@
 import { ConsumptionMethod } from "@prisma/client";
 import { MercadoPagoConfig, Preference } from "mercadopago";
 
+import { handleDownloadReceiptBack } from "@/app/helpers/cupom";
+
 const mercadopago = new MercadoPagoConfig({
   accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN!,
 });
@@ -128,29 +130,38 @@ export const createOrder = async (input: CreateOrderInput) => {
       total,
       restaurantId: restaurant.id,
     },
+    include: {
+      orderProducts: {
+        include: {
+          product: true, // garante que product.name estará disponível
+        },
+      },
+    },
   });
 
   // Enviar e-mail (sem alteração necessária)
-  if (orderResponse) {
-    try {
-      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/checkout-mail`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: orderResponse.customerName,
-          orderId: orderResponse.id,
-          total: orderResponse.total,
-          products: orderProductsValuesToMail,
-          control: input.control,
-          consumptionMethod: input.consumptionMethod,
-        }),
-      });
-    } catch (error) {
-      console.error("❌ Erro ao enviar e-mail:", error);
-    }
+if (orderResponse) {
+  // Retorna base64 puro do PDF
+  const pdfBase64 = handleDownloadReceiptBack(orderResponse);
+
+  try {
+    await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/checkout-mail`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: orderResponse.customerName,
+        orderId: orderResponse.id,
+        total: orderResponse.total,
+        products: orderProductsValuesToMail,
+        control: input.control,
+        consumptionMethod: input.consumptionMethod,
+        receiptBase64: pdfBase64, // enviar base64 puro
+      }),
+    });
+  } catch (error) {
+    console.error("❌ Erro ao enviar e-mail:", error);
   }
+}
 
   // Atualizar estoque
   for (const item of input.products) {

@@ -6,7 +6,7 @@ import { Trash2 } from "lucide-react"
 import { useState, useTransition } from "react"
 import { toast } from "sonner"
 
-import handleDownloadReceipt from "@/app/helpers/cupom"
+import { handleDownloadReceiptFront } from "@/app/helpers/cupom"
 import { formatCurrency } from "@/app/helpers/format-currency"
 import { Button } from "@/components/ui/button"
 import {
@@ -262,7 +262,7 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
                       <DialogTitle>Produtos do Pedido #{order.code}</DialogTitle>
                       <Button
                         variant="outline"
-                        onClick={() => handleDownloadReceipt(order)}
+                        onClick={() => handleDownloadReceiptFront(order)}
                         className="mt-2 text-sm bg-green-500 hover:bg-green-600 text-white"
                       >
                         Baixar Comprovante
