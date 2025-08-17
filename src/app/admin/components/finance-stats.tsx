@@ -185,7 +185,7 @@ export default function FinanceStats({
       </div>
       {selectedMonth && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 w-full max-w-md relative">
+          <div className="bg-white rounded-lg p-8 w-full max-w-2xl relative max-h-[80vh] overflow-y-auto">
             <button
               onClick={() => setSelectedMonth(null)}
               className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
@@ -198,10 +198,10 @@ export default function FinanceStats({
             </h3>
 
             <ul className="space-y-2">
-              {expenseValues
-                .filter((item) => item.reference === selectedMonth) // filtra pelo mês
-                .map((item, index) => (
-                 <li key={item.id} className="flex gap-2 items-center">
+            {expenseValues
+              .filter((item) => item.reference === selectedMonth)
+              .map((item, index) => (
+                <li key={item.id} className="flex gap-2 items-center">
                   <span className="w-[30px] font-bold">{index + 1}</span>
                   <span className="w-[200px] truncate">{item.description}</span>
                   <span className="w-[120px]">{item.createdAt.toLocaleDateString()}</span>
@@ -231,10 +231,10 @@ export default function FinanceStats({
                   </div>
                 </li>
               ))}
-              {expenseValues.filter((item) => item.reference === selectedMonth).length === 0 && (
-                <p className="text-gray-500">Sem dados</p>
-              )}
-            </ul>
+            {expenseValues.filter((item) => item.reference === selectedMonth).length === 0 && (
+              <p className="text-gray-500">Sem dados</p>
+            )}
+          </ul>
           </div>
         </div>
       )}
