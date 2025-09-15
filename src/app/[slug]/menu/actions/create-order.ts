@@ -109,7 +109,7 @@ export const createOrder = async (input: CreateOrderInput) => {
     (acc, item) => acc + item.price * item.quantity,
     0
   );
-  const deliveryFee = input.consumptionMethod === 'entrega' ? 8 : 0;
+  const deliveryFee = input.consumptionMethod === 'entrega' ? 10 : 0;
   const total = subtotal + deliveryFee;
 
   // Criar o pedido

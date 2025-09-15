@@ -64,7 +64,7 @@ export default function OrdersListComponent({ orders }: OrdersListComponentProps
   const [viewProductsOrderId, setViewProductsOrderId] = useState<number | null>(null)
   const [newStatus, setNewStatus] = useState<OrderStatus>('PENDING')
   const [isPending, startTransition] = useTransition()
-  const motoboy : number = 8
+  const motoboy : number = 10
   const getMinutesSince = (createdAt: string | Date, status: string) => {
     if (status !== "IN_PREPARATION" && status !== "PENDING") {
       switch (status) {

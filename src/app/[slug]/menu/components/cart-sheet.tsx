@@ -51,11 +51,11 @@ const CartSheet = () => {
               </div>}
               {consumptionMethod === 'entrega' && <div className="flex justify-between">
                 <p className="text-sm text-muted-foreground">Entrega </p>
-                <p className="font-semibold text-sm">{formatCurrency(8)}</p>
+                <p className="font-semibold text-sm">{formatCurrency(10)}</p>
               </div>}
               <div className="flex justify-between">
                 <p className="text-sm text-muted-foreground">Total </p>
-                <p className="font-semibold text-sm">{consumptionMethod === 'entrega' ? formatCurrency(total + 8) : formatCurrency(total)}</p>
+                <p className="font-semibold text-sm">{consumptionMethod === 'entrega' ? formatCurrency(total + 10) : formatCurrency(total)}</p>
               </div>
             </CardContent>
           </Card>
@@ -67,16 +67,14 @@ const CartSheet = () => {
               onCheckedChange={(checked) => setPayOnDelivery(Boolean(checked))}
             />
             <label htmlFor="pay-on-pickup" className="text-sm cursor-pointer">
-              Pagar na Retirada
+              Pagar na Retirada 
             </label>
           </div>
           {/* Button agora tem o evento onClick direto */}
           <Button
             className="w-full rounded-full"
             onClick={() => {
-              
                 setFinishOrderDialogIsOpen(true);
-         
             }}
           >
             Finalizar Pedido

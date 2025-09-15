@@ -57,6 +57,7 @@ export const handleDownloadReceiptFront = (order: Order) => {
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
+      timeZone: "America/Sao_Paulo", // 👈 força fuso de Brasília
     });
   };
 
@@ -106,7 +107,7 @@ export const handleDownloadReceiptFront = (order: Order) => {
     "-".repeat(MAX_LINE_WIDTH),
 
     ...(order.consumptionMethod === "entrega"
-      ? [`Entrega:`.padEnd(MAX_LINE_WIDTH - 8) + `R$ 8,00`]
+      ? [`Entrega:`.padEnd(MAX_LINE_WIDTH - 8) + `R$ 10,00`]
       : []),
 
     `TOTAL:`.padEnd(MAX_LINE_WIDTH - formatCurrency(order.total).length) +
@@ -168,6 +169,7 @@ export const handleDownloadReceiptBack = (order: Order) => {
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
+      timeZone: "America/Sao_Paulo", // 👈 força fuso de Brasília
     });
   };
 
@@ -216,7 +218,7 @@ export const handleDownloadReceiptBack = (order: Order) => {
     "-".repeat(MAX_LINE_WIDTH),
 
     ...(order.consumptionMethod === "entrega"
-      ? [`Entrega:`.padEnd(MAX_LINE_WIDTH - 8) + `R$ 8,00`]
+      ? [`Entrega:`.padEnd(MAX_LINE_WIDTH - 8) + `R$ 10,00`]
       : []),
 
     `TOTAL:`.padEnd(MAX_LINE_WIDTH - formatCurrency(order.total).length) +
