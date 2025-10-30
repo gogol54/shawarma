@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 
 import { db } from "@/lib/prisma"
 
+import HalloweenOverlay from "./components/animations/HalloweenOverlay"
 import RestaurantCategories from "./components/categories"
 import RestaurantHeader from "./components/header"
 
@@ -48,6 +49,7 @@ const randomData = restaurant?.menuCategories
   }
   return (
     <div>
+      <HalloweenOverlay />
       <RestaurantHeader restaurant={restaurant} slug={slug} />      
       <RestaurantCategories restaurant={restaurant} openWeek={openWeek} />
     </div>

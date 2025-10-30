@@ -122,14 +122,14 @@ const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProp
         <div className="flex items-center gap-2">
           <Image
             src={restaurant.avatarImageUrl}
-            alt={restaurant.name}
+            alt={restaurant.name} 
             width={45}
             height={45}
             quality={100}
             className="object-cover rounded-lg"
           />
           <div>
-            <h2 className="text-lg font-semibold">{restaurant.name}</h2>
+            <h2 className="text-lg font-semibold">{restaurant.name} 🎃 </h2>
             <p className="text-xs opacity-55">{restaurant.description}</p>
           </div>
         </div>
