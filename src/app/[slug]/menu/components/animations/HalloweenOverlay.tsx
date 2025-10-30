@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"
 import Image from "next/image"
-import { useEffect, useState } from "react"
+import { useEffect, useRef,useState } from "react"
 
 const ghosts = ["/halloween/ghost.png", "/halloween/ghost02.png"]
 const pumpkins = ["/halloween/pumpkin.png", "/halloween/witches.png"]
@@ -12,8 +12,10 @@ export default function HalloweenOverlay() {
   const [elements, setElements] = useState<
     { id: number; src: string; x: number; y: number; size: number }[]
   >([])
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
+    // gera os elementos aleatórios
     const newElements = Array.from({ length: 8 }).map((_, i) => ({
       id: i,
       src: [ghosts, pumpkins, bats][Math.floor(Math.random() * 3)][
@@ -24,10 +26,38 @@ export default function HalloweenOverlay() {
       size: Math.random() * 40 + 30,
     }))
     setElements(newElements)
+
+    // tenta tocar o áudio
+    const audio = audioRef.current
+    if (audio) {
+      audio.volume = 0.4
+      audio.loop = true
+
+      const playAudio = () => {
+        audio.play().catch(() => {
+          // browsers bloqueiam autoplay, ativa ao primeiro clique
+          const resume = () => {
+            audio.play()
+            document.removeEventListener("click", resume)
+          }
+          document.addEventListener("click", resume)
+        })
+      }
+
+      playAudio()
+    }
   }, [])
 
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-[60]">
+      {/* Áudio de fundo */}
+      <audio
+        ref={audioRef}
+        src="/halloween/sounds/castle-theme.mp3"
+        preload="auto"
+      />
+
+      {/* Itens animados */}
       {elements.map((el) => (
         <motion.div
           key={el.id}
@@ -49,13 +79,13 @@ export default function HalloweenOverlay() {
             left: `${el.x}%`,
           }}
         >
-          
           <Image
             src={el.src}
             alt="Halloween item"
             width={el.size}
             height={el.size}
-            className="opacity-80"
+            className="opacity-80 select-none"
+            draggable={false}
           />
         </motion.div>
       ))}
