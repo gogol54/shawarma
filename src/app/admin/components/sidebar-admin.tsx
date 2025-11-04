@@ -63,7 +63,7 @@ export function AppSidebar({ token }: { token: string }) {
     <Sidebar>
       <SidebarContent className="bg-slate-100 text-slate-900">
         <SidebarGroup>
-          <SidebarGroupLabel>SHAWARMA ROSUL - DELIVERY  </SidebarGroupLabel>
+          <SidebarGroupLabel>SHAWARMA ROSUL - DELIVERY </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {group_01.map((item) => (
@@ -80,7 +80,7 @@ export function AppSidebar({ token }: { token: string }) {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>Produtos</SidebarGroupLabel>
+          <SidebarGroupLabel>Produtos </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {group_02.map((item) => (
@@ -97,7 +97,7 @@ export function AppSidebar({ token }: { token: string }) {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>Pedidos</SidebarGroupLabel>
+          <SidebarGroupLabel>Pedidos </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {group_03.map((item) => (
