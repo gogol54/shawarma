@@ -13,9 +13,7 @@ const Products = ({products}: ProductsProps) => {
   const consumptionMethod = search.get("consumptionMethod")
   return (  
     <div className="space-y-3 px-5 pb-20">
-      {products
-        .filter(product => product.inStock > 0) // só produtos com estoque
-        .map((product) => {
+      {products.map((product) => {
         const isAvailable = product.inStock > 0;
 
         return (
