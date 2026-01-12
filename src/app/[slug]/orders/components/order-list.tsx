@@ -1,5 +1,5 @@
-"use server"
-
+"use client"
+ 
 import { OrderStatus, Prisma } from "@prisma/client";
 import { ScrollTextIcon } from "lucide-react";
 import Image from "next/image";
