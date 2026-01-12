@@ -14,9 +14,9 @@ datasource db {
 }
 
 model Restaurant {
-  id             String         @id @default(uuid())
+  id             String          @id @default(uuid())
   name           String
-  slug           String         @unique
+  slug           String          @unique
   description    String
   avatarImageUrl String
   coverImageUrl  String
@@ -24,8 +24,9 @@ model Restaurant {
   products       Product[]
   orders         Order[]
   expenses       Expense[]
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  loyaltyRedeems LoyaltyRedeem[] // 👈 ADICIONE ISSO
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 }
 
 model MenuCategory {
@@ -48,10 +49,10 @@ model Product {
   name           String
   description    String
   price          Float
-  offer          Float         @default(0)
-  inStock        Int           @default(25)
+  offer          Float          @default(0)
+  inStock        Int            @default(25)
   imageUrl       String
-  ingredients    Json          
+  ingredients    Json
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 }
@@ -59,7 +60,7 @@ model Product {
 model Order {
   id                Int               @id @default(autoincrement())
   code              String?           @unique
-  preferenceId      String?          
+  preferenceId      String?
   total             Float
   status            OrderStatus
   consumptionMethod ConsumptionMethod
@@ -71,17 +72,17 @@ model Order {
   customerCpf       String
   customerPhone     String            @default("0000000000")
   isPaid            Boolean           @default(false)
-  paymentMethod     String?           // PIX, CARD, CASH, etc
+  paymentMethod     String? // PIX, CARD, CASH, etc
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 }
 
 model OpeningHours {
-  id                Int               @id @default(autoincrement())
-  dayOfWeek         Int      // 0 (Domingo) até 6 (Sábado)
-  openTime          String   // Ex: "20:00"
-  closeTime         String   // Ex: "23:00"
-  isOpen            Boolean  // true = aberto nesse dia
+  id        Int     @id @default(autoincrement())
+  dayOfWeek Int // 0 (Domingo) até 6 (Sábado)
+  openTime  String // Ex: "20:00"
+  closeTime String // Ex: "23:00"
+  isOpen    Boolean // true = aberto nesse dia
 }
 
 enum OrderStatus {
@@ -102,7 +103,7 @@ model Expense {
   id           String     @id @default(uuid())
   description  String
   amount       Float
-  reference    String     // formato: YYYY-MM
+  reference    String // formato: YYYY-MM
   restaurantId String
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   createdAt    DateTime   @default(now())
@@ -116,7 +117,18 @@ model OrderProduct {
   orderId   Int
   quantity  Int
   price     Float
-  dropIng   Json?    // Adicionando a coluna dropIng à tabela OrderProduct
+  dropIng   Json? // Adicionando a coluna dropIng à tabela OrderProduct
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model LoyaltyRedeem {
+  id            Int      @id @default(autoincrement())
+  customerPhone String
+  restaurantId  String
+  createdAt     DateTime @default(now())
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@index([customerPhone])
 }

@@ -136,7 +136,7 @@ const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProp
 
         <div className="flex justify-start">
           <Button
-            className="bg-[#f5f5f5] text-[#333333] hover:bg-gray-200 mt-4 mb-2 w-32 max-h-8"
+            className="bg-white text-blue-500 underline hover:bg-white mt-4 mb-2 w-32 max-h-8"
             onClick={handleClickTimeStamp}
           >
             <p className="text-xs">Horário da Semana</p>
@@ -168,12 +168,32 @@ const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProp
                   <div className="text-sm font-semibold text-muted-foreground">
                     {day.isOpen ? `${day.openTime} às ${day.closeTime}` : "Fechado"}
                   </div>
+                 
                 </div>
               ))}
             </div>
           </DialogContent>
         </Dialog>
-
+        <Link href={`/${restaurant.slug}/club`} className="block">
+          <Button
+            className="
+              w-full
+              rounded-xl
+              bg-gradient-to-r from-yellow-400 via-lime-400 to-green-500
+              text-gray-900
+              font-bold
+              shadow-lg
+              animate-pulse
+              hover:animate-none
+              hover:scale-[1.04]
+              transition-all
+            "
+          >
+            🎁 Ganhe Shawarma Grátis
+          </Button>
+        </Link>
+            
+           
         <div className="flex flex-row justify-between text-xs mt-3 items-center">
           {open ? (
             <div className="flex flex-row items-center">
@@ -186,12 +206,14 @@ const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProp
               <p className="font-semibold text-red-500 mt-1 text-[14px]">Fechado</p>
             </div>
           )}
+           
           <div>
             <Link href={`/${restaurant.slug}/orders`} className="text-blue-500 text-[14px] underline">
               Meus pedidos
             </Link>
           </div>
         </div>
+         
       </div>
 
       {/* Menu fixo com categorias */}
