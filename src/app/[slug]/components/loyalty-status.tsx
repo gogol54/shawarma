@@ -29,9 +29,24 @@ const LoyaltyStatus = ({ phone, data }: LoyaltyStatusProps) => {
 
   const [loading, setLoading] = React.useState(false)
   const router = useRouter()
+
   const handleClick = async () => {
     if (loading) return
     setLoading(true)
+
+    // 📲 monta o WhatsApp ANTES de qualquer await (obrigatório no iOS)
+    const whatsappNumber = "55996838707"
+    const message = `Olá! Tudo bem?
+Completei 10 pedidos no programa de fidelidade e gostaria de realizar o resgate do meu Shawarma Grátis.
+Telefone: ${phone}
+Obrigado! :)`
+
+    const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+      message
+    )}`
+
+    // 🔥 abre imediatamente no clique (Safari iOS não bloqueia)
+    const whatsappWindow = window.open(whatsappURL, "_blank")
 
     try {
       await registerLoyaltyRedeem(
@@ -39,34 +54,26 @@ const LoyaltyStatus = ({ phone, data }: LoyaltyStatusProps) => {
         "2cc95952-c16f-414a-9b1c-9ff13b09c342"
       )
 
-      // 🔁 força o server a recalcular tudo
+      // 🔁 força o server a recalcular os dados
       router.refresh()
-
-      const whatsappNumber = "55996838707"
-      const message = `Olá! Tudo bem? 
-  Completei 10 pedidos no programa de fidelidade e gostaria de realizar o resgate do meu Shawarma Grátis.
-  Telefone: ${phone}
-  Obrigado!`
-
-      const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-        message
-      )}`
-
-      window.open(whatsappURL, "_blank")
     } catch (error) {
-      console.log(error)
-      toast.info("Esse resgate já foi utilizado ou não está mais disponível..");
+      console.error(error)
+      toast.info("Esse resgate já foi utilizado ou não está mais disponível.")
+
+      // ❌ se deu erro, fecha o WhatsApp aberto
+      whatsappWindow?.close()
+    } finally {
       setLoading(false)
     }
   }
-  const displayOrdersUntilNextReward = ordersUntilNextReward === 0 ? 10 : ordersUntilNextReward
+
+  const displayOrdersUntilNextReward =
+    ordersUntilNextReward === 0 ? 10 : ordersUntilNextReward
+
   return (
     <div className="space-y-4 p-4">
-      {/* Voltar ao menu */}
-
-
       <h2 className="text-lg font-semibold text-center">
-       ⭐ Programa de Fidelidade ⭐
+        ⭐ Programa de Fidelidade ⭐
       </h2>
 
       <p>
