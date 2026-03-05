@@ -35,8 +35,6 @@ const OrdersPage = async ({ params, searchParams }: OrdersPageProps) => {
   const totalOrders = await db.order.count({
     where: {
       customerPhone,
-      isPaid: true,
-      status: "FINISHED",
     },
   })
 
