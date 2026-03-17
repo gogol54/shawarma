@@ -4,7 +4,7 @@ import { Prisma } from "@prisma/client"
 import { ClockIcon, LockIcon } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { useContext, useEffect, useRef,useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 
 import { formatCurrency } from "@/app/helpers/format-currency"
 import { fetchIsRestaurantOpen } from "@/app/helpers/is-open"
@@ -35,7 +35,10 @@ interface RestaurantCategoriesProps {
 
 const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProps) => {
   const { products, total, totalQuantity, setIsOpen } = useContext(CartContext)
+
+  // 🔥 começa como null (carregando)
   const [open, setOpenRestaurant] = useState<boolean | null>(null)
+
   const [openDialog, setOpenDialog] = useState<boolean | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<typeof restaurant.menuCategories[0] | null>(null)
   const sectionRefs = useRef<Record<string, HTMLElement>>({})
@@ -62,7 +65,7 @@ const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProp
     checkOpen()
   }, [restaurant.id])
 
-  // Monta o ref das seções
+  // refs das seções
   useEffect(() => {
     const refs: Record<string, HTMLElement> = {}
     restaurant.menuCategories.forEach(category => {
@@ -75,11 +78,10 @@ const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProp
     sectionRefs.current = refs
   }, [restaurant.menuCategories])
 
-  // Função para detectar a seção visível pelo scroll
+  // detectar categoria visível
   useEffect(() => {
     const onScroll = () => {
-      const scrollPosition = window.scrollY + 100 // Ajusta conforme a altura da barra sticky etc
-
+      const scrollPosition = window.scrollY + 100
       let currentCategory = restaurant.menuCategories[0].name
 
       for (const category of restaurant.menuCategories) {
@@ -91,7 +93,9 @@ const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProp
       }
 
       if (currentCategory !== selectedCategory?.name) {
-        setSelectedCategory(restaurant.menuCategories.find(cat => cat.name === currentCategory) || null)
+        setSelectedCategory(
+          restaurant.menuCategories.find(cat => cat.name === currentCategory) || null
+        )
       }
     }
 
@@ -107,7 +111,7 @@ const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProp
   const handleCategoryClick = (category: typeof restaurant.menuCategories[0]) => {
     const el = sectionRefs.current[category.name]
     if (el) {
-      window.scrollTo({ top: el.offsetTop - 80, behavior: "smooth" }) // Ajuste -80 para compensar sticky header
+      window.scrollTo({ top: el.offsetTop - 80, behavior: "smooth" })
     }
     setSelectedCategory(category)
   }
@@ -118,7 +122,7 @@ const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProp
   return (
     <div className="relative z-50 mt-[-1.5rem] rounded-t-3xl bg-white">
       <div className="p-5">
-        {/* Header restaurante */}
+        {/* Header */}
         <div className="flex items-center gap-2">
           <Image
             src={restaurant.avatarImageUrl}
@@ -134,6 +138,7 @@ const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProp
           </div>
         </div>
 
+        {/* Botão horários */}
         <div className="flex justify-start">
           <Button
             className="bg-white text-blue-500 underline hover:bg-white mt-4 mb-2 w-32 max-h-8"
@@ -143,6 +148,7 @@ const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProp
           </Button>
         </div>
 
+        {/* Dialog */}
         <Dialog open={openDialog === true && Array.isArray(openWeek)} onOpenChange={() => setOpenDialog(!openDialog)}>
           <DialogTrigger asChild />
           <DialogContent className="max-h-[80vh] overflow-y-auto">
@@ -168,12 +174,13 @@ const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProp
                   <div className="text-sm font-semibold text-muted-foreground">
                     {day.isOpen ? `${day.openTime} às ${day.closeTime}` : "Fechado"}
                   </div>
-                 
                 </div>
               ))}
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Fidelidade */}
         <Link href={`/${restaurant.slug}/club`} className="block">
           <Button
             className="
@@ -192,34 +199,42 @@ const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProp
             🎁 Ganhe Shawarma Grátis
           </Button>
         </Link>
-            
-           
+
+        {/* STATUS */}
         <div className="flex flex-row justify-between text-xs mt-3 items-center">
-          {open ? (
+          {open === null ? (
+            <div className="flex flex-row items-center">
+              <ClockIcon size={12} className="mt-1 mr-1 text-gray-400" />
+              <p className="font-semibold text-gray-400 mt-1 text-[14px]">
+                Verificando...
+              </p>
+            </div>
+          ) : open ? (
             <div className="flex flex-row items-center">
               <ClockIcon size={12} className="mt-1 mr-1 text-green-500" />
-              <p className="font-semibold text-green-500 mt-1 text-[14px]">Aberto!</p>
+              <p className="font-semibold text-green-500 mt-1 text-[14px]">
+                Aberto!
+              </p>
             </div>
           ) : (
             <div className="flex flex-row items-center">
               <LockIcon size={12} className="mt-1 mr-1 text-red-500" />
-              <p className="font-semibold text-red-500 mt-1 text-[14px]">Fechado</p>
+              <p className="font-semibold text-red-500 mt-1 text-[14px]">
+                Fechado
+              </p>
             </div>
           )}
-           
+
           <div>
             <Link href={`/${restaurant.slug}/orders`} className="text-blue-500 text-[14px] underline">
               Meus pedidos
             </Link>
           </div>
         </div>
-         
       </div>
 
-      {/* Menu fixo com categorias */}
+      {/* Categorias */}
       <div className="sticky top-0 z-40 bg-white pt-3 pb-1 shadow-md">
-        <div className="px-5 pb-2 font-semibold text-base">
-        </div>
         <ScrollArea className="overflow-hidden w-full">
           <div className="flex w-max space-x-4 px-5">
             {restaurant.menuCategories.map((category) => (
@@ -238,7 +253,7 @@ const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProp
         </ScrollArea>
       </div>
 
-      {/* Conteúdo das categorias */}
+      {/* Produtos */}
       <div>
         {restaurant.menuCategories.map((category) => (
           <section
@@ -251,7 +266,7 @@ const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProp
         ))}
       </div>
 
-      {/* Sacola */}
+      {/* Carrinho */}
       {products.length > 0 && (
         <div className="fixed bottom-0 left-0 right-0 flex w-full items-center justify-between border-t bg-white px-5 py-3 z-50">
           <div>
