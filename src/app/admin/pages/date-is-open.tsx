@@ -23,7 +23,7 @@ export default function OpeningHoursForm() {
     const initial = Array.from({ length: 7 }, (_, i) => ({
       dayOfWeek: i,
       isOpen: false,
-      openTime: '20:00',
+      openTime: '19:30',
       closeTime: '23:00',
     }));
     setHours(initial);
