@@ -10,14 +10,16 @@ import { PatternFormat } from "react-number-format";
 import { toast } from "sonner";
 import z from "zod";
 
+//import { isOpenRestaurant } from "@/app/helpers/is-open";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import {
   Form,
   FormControl,
@@ -59,9 +61,7 @@ const FinishDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
   const search = useSearchParams();
   const { products, clearCart, setIsOpen, payOnDelivery } =
     useContext(CartContext);
-
   const [isPending, startTransition] = useTransition();
-
   const { slug } = useParams();
   const safeSlug = Array.isArray(slug) ? slug[0] : (slug ?? "");
 
@@ -103,30 +103,35 @@ const FinishDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
           slug: safeSlug,
           control: payOnDelivery,
         });
-
         if (response?.orderId) {
           clearCart();
           setIsOpen(false);
           onOpenChange(false);
-
           toast.success("Redirecionando para o pagamento...");
 
+          // Redireciona para o checkout com o preferenceId
           window.location.href = `/checkout/${response.orderId}`;
-          return;
         }
-
         if (response?.redirectUrl) {
           clearCart();
           setIsOpen(false);
           onOpenChange(false);
-
           toast.success("Agradecemos pela preferência!");
-
           window.location.href = response.redirectUrl;
-          return;
+        }
+        if (!response) {
+          toast.error("Erro ao iniciar pagamento.");
         }
 
-        toast.error("Erro ao iniciar pagamento.");
+        // if (response?.redirectUrl) {
+        //   clearCart();
+        //   setIsOpen(false);
+        //   onOpenChange(false);
+        //   toast.success("Agradecemos pela preferência!");
+        //   window.location.href = response.redirectUrl;
+        // } else {
+        //   toast.error("Erro ao redirecionar para o pagamento.");
+        // }
       } catch (error) {
         toast.error("Algum erro foi encontrado, tente novamente!");
         console.log(error);
@@ -135,17 +140,16 @@ const FinishDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-hidden sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>Finalizar Pedido</DialogTitle>
-
-          <DialogDescription>
+    <Drawer open={open} onOpenChange={onOpenChange}>
+      <DrawerContent className="flex h-[90dvh] w-full flex-col rounded-t-lg bg-white shadow-lg">
+        <DrawerHeader>
+          <DrawerTitle>Finalizar Pedido</DrawerTitle>
+          <DrawerDescription>
             Insira suas informações para finalizar o pedido
-          </DialogDescription>
-        </DialogHeader>
+          </DrawerDescription>
+        </DrawerHeader>
 
-        <div className="overflow-y-auto px-1">
+        <div className="flex-1 scroll-pb-40 space-y-4 overflow-y-auto px-4">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
@@ -161,7 +165,6 @@ const FinishDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
                   </FormItem>
                 )}
               />
-
               <FormField
                 name="phone"
                 control={form.control}
@@ -179,7 +182,6 @@ const FinishDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
                   </FormItem>
                 )}
               />
-
               <FormField
                 name="cpf"
                 control={form.control}
@@ -197,7 +199,6 @@ const FinishDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
                   </FormItem>
                 )}
               />
-
               <FormField
                 name="address.street"
                 control={form.control}
@@ -211,7 +212,6 @@ const FinishDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
                   </FormItem>
                 )}
               />
-
               <FormField
                 name="address.number"
                 control={form.control}
@@ -225,7 +225,6 @@ const FinishDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
                   </FormItem>
                 )}
               />
-
               <FormField
                 name="address.complement"
                 control={form.control}
@@ -242,7 +241,6 @@ const FinishDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
                   </FormItem>
                 )}
               />
-
               <FormField
                 name="address.zone"
                 control={form.control}
@@ -257,29 +255,28 @@ const FinishDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
                 )}
               />
 
-              <div className="space-y-2 pb-2 pt-2">
+              <div className="space-y-2 pb-6 pt-2">
                 <Button type="submit" className="w-full" disabled={isPending}>
                   {isPending && (
                     <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                  )}
+                  )}{" "}
                   Efetuar Compra
                 </Button>
-
-                <Button
-                  type="button"
-                  variant="destructive"
-                  className="w-full"
-                  disabled={isPending}
-                  onClick={() => onOpenChange(false)}
-                >
-                  Cancelar
-                </Button>
+                <DrawerClose asChild>
+                  <Button
+                    variant="destructive"
+                    className="w-full"
+                    disabled={isPending}
+                  >
+                    Cancelar
+                  </Button>
+                </DrawerClose>
               </div>
             </form>
           </Form>
         </div>
-      </DialogContent>
-    </Dialog>
+      </DrawerContent>
+    </Drawer>
   );
 };
 
