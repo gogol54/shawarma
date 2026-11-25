@@ -141,6 +141,7 @@ const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProp
         {/* Botão horários */}
         <div className="flex justify-start">
           <Button
+            variant="ghost"
             className="bg-white text-blue-500 underline hover:bg-white mt-4 mb-2 w-32 max-h-8"
             onClick={handleClickTimeStamp}
           >
@@ -183,6 +184,7 @@ const RestaurantCategories = ({ restaurant, openWeek }: RestaurantCategoriesProp
         {/* Fidelidade */}
         <Link href={`/${restaurant.slug}/club`} className="block">
           <Button
+            variant="ghost"
             className="
               w-full
               rounded-xl

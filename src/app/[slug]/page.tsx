@@ -15,6 +15,12 @@ const RestaurantsPage = async ({ params }: RestaurantsPageProps) => {
   }
   return (
     <div className="flex flex-col items-center justify-center-px-6 pt-12">
+      <div className="mb-8 w-[calc(100%-3rem)] max-w-md rounded-md bg-blackweek-gradient px-5 py-4 text-center text-white shadow-wine">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/75">
+          Ofertas por tempo limitado
+        </p>
+        <h1 className="mt-1 text-2xl font-extrabold uppercase">Black Week</h1>
+      </div>
       <div className="flex flex-col items-center gap-2">
           <Image 
             src={restaurant?.avatarImageUrl}
