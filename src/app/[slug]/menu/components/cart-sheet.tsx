@@ -34,25 +34,30 @@ const CartSheet = () => {
   return (
     <Sheet open={isOpen} onOpenChange={() => setIsOpen(!isOpen)}>
       <SheetContent className="mx-auto w-[85%] max-w-[450px]">
-        <Button
-          variant="default"
-          className="bg- bg-hover:bg-amber-500 mb-10 mt-[-5] w-min rounded-md bg-amber-400 hover:bg-amber-300"
-          onClick={() => setIsOpen(false)}
-        >
-          Continuar comprando
-        </Button>
+          <div
+            className="m-[-10px] mb-[2px] flex w-fit cursor-pointer items-center gap-1 text-sm text-[#6a0d1f]"
+            onClick={() => setIsOpen(false)}
+          >
+            ← Continuar comprando
+          </div>
         <SheetHeader>
           <SheetTitle>Suas Compras</SheetTitle>
         </SheetHeader>
         <div className="flex h-full flex-col py-5">
           <div className="max-h-[500px] space-y-4 overflow-y-auto pb-7">
             {products.map((product) => (
-              <CartItem
-                key={`${product.id}-${JSON.stringify(product.dropIng)}`}
-                item={product}
-              />
+              <div key={`${product.id}-${JSON.stringify(product.dropIng)}`}>
+                <CartItem item={product} />
+
+                {product.dropIng?.length > 0 && (
+                  <p className="mt-1 pl-2 text-xs text-neutral-500">
+                    Sem: {product.dropIng.join(", ")}
+                  </p>
+                )}
+              </div>
             ))}
           </div>
+                   
           <Card className="mb-6">
             <CardContent className="p-5">
               {consumptionMethod === "entrega" && (
@@ -87,7 +92,7 @@ const CartSheet = () => {
               onCheckedChange={(checked) => setPayOnDelivery(Boolean(checked))}
             />
             <label htmlFor="pay-on-pickup" className="cursor-pointer text-sm">
-              Pagar na Retirada
+              Pagar na Retirada/dinheiro
             </label>
           </div>
           {/* Button agora tem o evento onClick direto */}
